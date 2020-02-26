@@ -12,7 +12,7 @@ private:
 public:
         static double add(double a,double b)
         {
-            if(a==b)
+            if(abs(a-b)<1e-5)
                 return 0;
             else
                 return 1;
@@ -20,7 +20,7 @@ public:
 
         static double mul(double a,double b)
         {
-            if(a==1 && b==1)
+            if(abs(a-1)<1e-5 && abs(b-1)<1e-5)
                 return 1;
             else
                 return 0;
@@ -257,7 +257,7 @@ public:
                 //得到从当前矩阵中划去第0行和第j列的所有元素后得到的矩阵
                 for (unsigned int j = 0; j < this->r; j++)
                 {
-                    double m=vector::add(this->algCofactor(0,j),this->m[0][j]);
+                    double m = vector::mul(this->algCofactor(0,j),this->m[0][j]);
                     result = vector::add(result,m);
                 }
                 return result;
@@ -322,7 +322,7 @@ public:
                 matrix result(this->r,this->c);
                 for (unsigned int i = 0; i < this->r; i++)
                     for (unsigned int j = 0; j < this->c; j++)
-                        result.m[i][j]=this->m[i][j]+m2.m[i][j];
+                        result.m[i][j]=vector::add(this->m[i][j],m2.m[i][j]);
                 return result;
             }
             else
@@ -420,8 +420,7 @@ public:
                 bool isfound=false;
                 for(unsigned int j=i;j<this->r;j++)
                 {
-                    unsigned int ii=this->c-1-i;
-                    if(this->m[j][ii]==1)
+                    if(this->m[j][unitStart+i]==1)
                     {
                         this->rswap(i,j);
                         isfound=true;
@@ -432,8 +431,7 @@ public:
                     break;
                 for(unsigned int j=i+1;j<this->r;j++)
                 {
-                    unsigned int ii=this->c-1-i;
-                    if(this->m[j][ii]==1)
+                    if(this->m[j][unitStart+i]==1)
                         this->radd(j,i); //改变的是j
                 }
             }
