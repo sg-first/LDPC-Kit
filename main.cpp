@@ -1,6 +1,6 @@
-#include<iostream>
+#include <iostream>
+#include <vector>
 #include "matrix.h"
-using namespace std;
 
 unsigned int calu1(matrix m,unsigned int start=0)
 {
@@ -16,61 +16,64 @@ unsigned int calu1(matrix m,unsigned int start=0)
     return result;
 }
 
-int main()
+void assignment(double* v,std::vector<int> av)
+{
+    for(unsigned int i=0;i<av.size();i++)
+        v[i]=av[i];
+}
+
+void inputElm(matrix& m)
+{
+    for(unsigned int i=0;i<m.getr();i++)
+    {
+        for(unsigned int j=0;j<m.getc();j++)
+            std::cin>>m.m[i][j];
+    }
+}
+
+matrix inputM()
 {
     unsigned int r,c;
-    cout<<"r:";
-    cin>>r;
-    cout<<"c:";
-    cin>>c;
+    std::cout<<"r:";
+    std::cin>>r;
+    std::cout<<"c:";
+    std::cin>>c;
     matrix m(r,c);
+    inputElm(m);
+    return m;
+}
 
-    for(unsigned int i=0;i<r;i++)
+int main()
+{
+    std::vector<int>av;
+    matrix H(5,10);
+    av={1,1,1,0,0,0,1,0,0,0};
+    assignment(H.m[0],av);
+    av={1,0,0,1,0,1,0,1,0,0};
+    assignment(H.m[1],av);
+    av={0,1,0,1,1,0,0,0,1,0};
+    assignment(H.m[2],av);
+    av={0,0,1,0,1,1,0,0,0,1};
+    assignment(H.m[3],av);
+    av={0,0,0,0,0,0,1,1,1,1};
+
+    std::string s;
+    std::cin>>s;
+    if(s=="inv")
     {
-        for(unsigned int j=0;j<c;j++)
-            cin>>m.m[i][j];
+        matrix m=inputM();
+        std::cout<<std::endl<<"inv:"<<std::endl;
+        m.inv().output();
     }
-
-    m.output();
-
-    unsigned int start;
-    cout<<"start:";
-    cin>>start;
-
-    m.toUnit(start);
-    m.output();
-    cout<<"next"<<endl;
-    m.radd(2,4);
-    m.output();
-
-    bool isBreak=false;
-    do
+    else if(s=="verify")
     {
-        matrix useM=m;
-        isBreak=false;
-        for(unsigned int i=0;i<r;i++)
-        {
-            for(unsigned int j=i+1;j<r;j++)
-            {
-                useM.radd(j,i);
-                if(calu1(useM,start)<calu1(m,start) && calu1(useM)<calu1(m))
-                {
-                    cout<<j<<","<<i<<endl;
-                    m=useM;
-                    cout<<"next"<<endl;
-                    m.output();
-                    isBreak=true;
-                    break;
-                }
-                else
-                {
-                    cout<<"fail"<<endl;
-                    useM=m;
-                }
-            }
-            if(isBreak)
-                break;
-        }
-    } while(isBreak);
-    m.output();
+        unsigned int l;
+        std::cout<<"c l:";
+        std::cin>>l;
+        matrix v(1,l);
+        inputElm(v);
+        v=v.transpose();
+        std::cout<<std::endl<<"result:"<<std::endl;
+        H.dot(v).output();
+    }
 }

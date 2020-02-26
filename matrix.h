@@ -3,7 +3,6 @@
 #include <math.h>
 #include <tuple>
 #include "exception.h"
-using namespace std;
 
 class vector
 {
@@ -11,6 +10,22 @@ private:
         unsigned int l;
 
 public:
+        static double add(double a,double b)
+        {
+            if(a==b)
+                return 0;
+            else
+                return 1;
+        }
+
+        static double mul(double a,double b)
+        {
+            if(a==1 && b==1)
+                return 1;
+            else
+                return 0;
+        }
+
         double *v;
 
         vector(unsigned int l)
@@ -37,7 +52,10 @@ public:
                 {
                     double result = 0;
                     for (unsigned int i = 0; i < l; i++)
-                            result += this->v[i] * v2.v[i];
+                    {
+                        double m=vector::mul(this->v[i],v2.v[i]);
+                        result=vector::add(result,m);
+                    }
                     return result;
                 }
         }
@@ -58,12 +76,7 @@ public:
             {
                 vector result(this->l);
                 for (unsigned int i = 0; i < l; i++)
-                {
-                    if(this->v[i]==v2.v[i])
-                        result.v[i]=0;
-                    else
-                        result.v[i]=1;
-                }
+                    result.v[i]=vector::add(this->v[i],v2.v[i]);
                 return result;
             }
         }
@@ -228,7 +241,8 @@ public:
                     mb.m[subR][subC] = this->m[r][c];
                 }
             }
-            return pow(-1, i + j) * mb.det();
+            //return pow(-1, i + j) * mb.det(); //fix:二进制的正负号取消
+            return mb.det();
         }
 
         double det() const
@@ -243,7 +257,8 @@ public:
                 //得到从当前矩阵中划去第0行和第j列的所有元素后得到的矩阵
                 for (unsigned int j = 0; j < this->r; j++)
                 {
-                    result += this->algCofactor(0,j) * this->m[0][j];
+                    double m=vector::add(this->algCofactor(0,j),this->m[0][j]);
+                    result = vector::add(result,m);
                 }
                 return result;
             }
@@ -296,7 +311,7 @@ public:
             matrix result(this->r,this->c);
             for (unsigned int i = 0; i < this->r; i++)
                 for (unsigned int j = 0; j < this->c; j++)
-                    result.m[i][j]=this->m[i][j]*n;
+                    result.m[i][j]=vector::mul(this->m[i][j],n);
             return result;
         }
 
@@ -436,7 +451,7 @@ public:
             }*/
         }
 
-        tuple<matrix,matrix,matrix> LUP() const
+        std::tuple<matrix,matrix,matrix> LUP() const
         {
             if (this->r != this->c)
                 throw SquareException();
@@ -459,7 +474,7 @@ public:
                     }
                 }
                 if (m == 0)
-                    throw string("奇异矩阵");
+                    throw std::string("奇异矩阵");
                 p.rswap(k, kp);
                 a.rswap(k, kp);
                 l.rswap(k, kp);
@@ -474,7 +489,7 @@ public:
                     l.m[i][k] = a.m[i][k];
                 }
             }
-            return make_tuple(l,u,p);
+            return std::make_tuple(l,u,p);
         }
 
         void radd(unsigned int r1, unsigned int r2)
