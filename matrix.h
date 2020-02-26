@@ -280,6 +280,17 @@ public:
             }
         }
 
+        matrix cut(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2)
+        {
+            matrix ret(y2-y1,x2-x1);
+            for(unsigned int y=y1 , i=0 ; y<=y2 ; y++ , i++)
+            {
+                for(unsigned int x=x1 , j=0 ; x<=x2 ; x++ , j++)
+                    ret.m[i][j]=this->m[y][x];
+            }
+            return ret;
+        }
+
         matrix inv() const
         {
             double d=this->det();
