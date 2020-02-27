@@ -117,7 +117,10 @@ public:
 
         static double mulInv(unsigned int i) //1乘几为1
         {
-            return vector::div(i,1);
+            if(i==0)
+                return 0;
+            else
+                return vector::div(i,1);
         }
 
         double *v;
@@ -393,11 +396,12 @@ public:
 
         matrix elmMulInv()
         {
-            matrix result(this->r,this->c);
+            /*matrix result(this->r,this->c);
             for (unsigned int i = 0; i < this->r; i++)
                 for (unsigned int j = 0; j < this->c; j++)
                     result.m[i][j]=vector::mulInv(this->m[i][j]);
-            return result;
+            return result;*/
+            return *this;
         }
 
         matrix dot(const matrix &m2) const

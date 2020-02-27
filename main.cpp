@@ -75,6 +75,21 @@ bool check(matrix s,matrix p1,matrix p2,matrix H)
     return true;
 }
 
+std::string binaryConversion(int num,int bin=vector::p)
+{
+    std::string result;
+    do
+    {
+        result=std::to_string(num%bin)+result;
+        num=num/bin;
+    } while(num>=1);
+
+    while(result.size()<bin)
+        result="0"+result;
+
+    return result;
+}
+
 unsigned int vector::mulTable[p*p][3];
 
 int main()
@@ -123,10 +138,9 @@ int main()
     matrix C=H.cut(0,7,9,9);
 
     matrix s(1,10);
-    for(unsigned int i=0;i<1024;i++)
+    for(unsigned int i=0;i<1073741823;i++)
     {
-        std::bitset<10> t(i);
-        std::string as=t.to_string();
+        std::string as=binaryConversion(i);
         assignment(s.m[0],as);
 
         matrix sT=s.transpose();
