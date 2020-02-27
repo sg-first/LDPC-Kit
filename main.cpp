@@ -2,13 +2,15 @@
 #include <vector>
 #include "matrix.h"
 #include <thread>
+#include <map>
+#include <array>
 
-unsigned int calu1(matrix m,unsigned int start=0)
+uint calu1(matrix m,uint start=0)
 {
-    unsigned int result=0;
-    for(unsigned int i=0;i<m.getr();i++)
+    uint result=0;
+    for(uint i=0;i<m.getr();i++)
     {
-        for(unsigned int j=start;j<m.getc();j++)
+        for(uint j=start;j<m.getc();j++)
         {
             if(m.m[i][j]==1)
                 result++;
@@ -19,28 +21,28 @@ unsigned int calu1(matrix m,unsigned int start=0)
 
 void assignment(double* v,std::vector<int> av)
 {
-    for(unsigned int i=0;i<av.size();i++)
+    for(uint i=0;i<av.size();i++)
         v[i]=av[i];
 }
 
 void assignment(double* v,std::string as)
 {
-    for(unsigned int i=0;i<as.size();i++)
+    for(uint i=0;i<as.size();i++)
         v[i]=as[i]-48;
 }
 
 void inputElm(matrix& m)
 {
-    for(unsigned int i=0;i<m.getr();i++)
+    for(uint i=0;i<m.getr();i++)
     {
-        for(unsigned int j=0;j<m.getc();j++)
+        for(uint j=0;j<m.getc();j++)
             std::cin>>m.m[i][j];
     }
 }
 
 matrix inputM()
 {
-    unsigned int r,c;
+    uint r,c;
     std::cout<<"r:";
     std::cin>>r;
     std::cout<<"c:";
@@ -55,17 +57,17 @@ void endl() { std::cout<<std::endl; }
 bool check(matrix s,matrix p1,matrix p2,matrix H)
 {
     matrix c(1,20);
-    for(unsigned int i=0;i<10;i++)
+    for(uint i=0;i<10;i++)
         c.m[0][i]=s.m[0][i];
-    for(unsigned int i=10;i<13;i++)
+    for(uint i=10;i<13;i++)
         c.m[0][i]=p1.m[0][i-10];
-    for(unsigned int i=13;i<20;i++)
+    for(uint i=13;i<20;i++)
         c.m[0][i]=p2.m[0][i-13];
     //std::cout<<"check:"<<std::endl;
     s.output();
     matrix result=H.dot(c.transpose()).transpose();
 
-    for(unsigned int i=0;i<result.getc();i++)
+    for(uint i=0;i<result.getc();i++)
     {
         if(result.m[0][i]!=0)
         {
@@ -94,11 +96,11 @@ std::string binaryConversion(int num,int bin=GF::p)
 
 matrix *errorMat=nullptr;
 
-void checkLoop(unsigned int min,unsigned int max,
+void checkLoop(uint min,uint max,
                matrix E,matrix Ti,matrix A,matrix C,matrix fii,matrix B,matrix H)
 {
     matrix s(1,10);
-    for(unsigned int i=min;i<max;i++)
+    for(uint i=min;i<max;i++)
     {
         std::string as=binaryConversion(i);
         assignment(s.m[0],as);
@@ -130,10 +132,50 @@ void checkLoop(unsigned int min,unsigned int max,
     std::cout<<"finished!"<<std::endl;
 }
 
-/*std::tuple<unsigned int,vector<> > tetracyclicDetection(matrix H)
+
+typedef std::array<uint,4> cycle;
+std::vector<cycle> tetracyclicDetection(matrix H)
 {
-    for()
-}*/
+    std::vector<cycle> result;
+
+    auto updateCD=[](std::map<uint,std::vector<uint>> &allCD,uint b,uint pos) //map first是元素，second是所有位置
+    {
+        if (allCD.count(b) == 0) //没有
+            allCD[b]=std::vector<uint>();
+        allCD[b].push_back(pos);
+    };
+
+    auto deteGroup=[&](uint p1,uint p2,uint b,uint nowi)
+    {
+        for(uint i=nowi+1;i<H.getr();i++)
+        {
+            if(H.m[i][p1]==b && H.m[i][p2]==b)
+                result.push_back({nowi,p1,i,p2});
+        }
+    };
+
+    auto deteAllGroup=[deteGroup](const std::vector<uint> &allp,uint b,uint nowi)
+    {
+        for(uint i=0;i<allp.size()-1;i++)
+            for(uint j=i+1;j<allp.size();j++)
+                deteGroup(allp[i],allp[j],b,nowi);
+    };
+
+    for(uint i=0;i<H.getr();i++)
+    {
+        std::map<uint,std::vector<uint>> allCD;
+        for(uint j=0;j<H.getc();j++)
+        {
+            if(H.m[i][j]!=0)
+                updateCD(allCD,H.m[i][j],j); //找同行一样的
+        }
+        //所有一样的找到，开始检测
+        for (auto iter=allCD.begin(); iter!=allCD.end(); iter++)
+            deteAllGroup(iter->second,iter->first,i);
+    }
+
+    return result;
+}
 
 int main()
 {
@@ -162,6 +204,10 @@ int main()
     av={3,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0};
     assignment(H.m[9],av);
 
+    H.output();
+    auto aa=tetracyclicDetection(H);
+    std::cout<<aa[0][0]<<aa[0][1]<<aa[0][2]<<aa[0][3]<<std::endl;
+
     matrix T=H.cut(13,0,19,6);
     matrix Ti=T.inv();
     Ti.output();
@@ -180,19 +226,19 @@ int main()
     matrix A=H.cut(0,0,9,6);
     matrix C=H.cut(0,7,9,9);
 
-    unsigned int now=257104400;
-    unsigned int last=1073741823;
-    const unsigned int threadNum=100;
-    unsigned int every=(last-now)/threadNum;
+    uint now=257104400;
+    uint last=1073741823;
+    const uint threadNum=100;
+    uint every=(last-now)/threadNum;
     std::thread *t[threadNum];
-    for(unsigned int i=0;i<threadNum-1;i++)
+    for(uint i=0;i<threadNum-1;i++)
     {
         t[i]=new std::thread([=](){checkLoop(now,now+every,E,Ti,A,C,fii,B,H);});
         now+=every;
     }
     t[threadNum-1]=new std::thread([=](){checkLoop(now,last,E,Ti,A,C,fii,B,H);});
 
-    for(unsigned int i=0;i<threadNum-1;i++)
+    for(uint i=0;i<threadNum-1;i++)
         t[i]->join();
     if(errorMat!=nullptr)
         errorMat->output();
