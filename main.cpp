@@ -75,40 +75,50 @@ bool check(matrix s,matrix p1,matrix p2,matrix H)
     return true;
 }
 
+unsigned int vector::mulTable[p*p][3];
+
 int main()
 {
+    vector::initMulTable();
+
     std::vector<int>av;
     matrix H(10,20);
-    av={1,1,0,0,0,1,0,0,0,0,1,0,1,1,0,0,0,0,0,0};
+    av={2,2,0,0,0,2,0,0,0,0,2,0,2,2,0,0,0,0,0,0};
     assignment(H.m[0],av);
-    av={0,0,0,0,1,0,1,0,1,0,0,1,0,1,1,0,0,0,0,0};
+    av={0,0,0,0,4,0,4,0,4,0,0,4,0,4,4,0,0,0,0,0};
     assignment(H.m[1],av);
-    av={0,1,0,1,0,0,0,1,0,0,1,0,0,0,1,1,0,0,0,0};
+    av={0,3,0,3,0,0,0,3,0,0,3,0,0,0,3,3,0,0,0,0};
     assignment(H.m[2],av);
-    av={0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1,1,0,0,0};
+    av={0,0,1,0,0,0,1,0,6,0,0,0,6,0,0,6,6,0,0,0};
     assignment(H.m[3],av);
-    av={0,0,0,1,0,0,0,0,0,1,0,1,0,0,1,0,1,1,0,0};
+    av={0,0,0,7,0,0,0,0,0,7,0,7,0,0,7,0,7,7,0,0};
     assignment(H.m[4],av);
-    av={1,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0};
+    av={5,0,0,0,5,0,0,5,0,0,0,0,0,5,0,0,0,5,5,0};
     assignment(H.m[5],av);
-    av={0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,1,1};
+    av={0,0,2,0,0,0,2,0,0,2,0,0,0,0,0,0,2,0,2,2};
     assignment(H.m[6],av);
-    av={0,0,0,1,0,1,0,0,1,0,0,1,1,0,0,1,0,1,0,1};
+    av={0,0,0,2,0,2,0,0,2,0,0,2,2,0,0,2,0,2,0,2};
     assignment(H.m[7],av);
-    av={0,1,0,0,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,1};
+    av={0,4,0,0,0,4,0,4,0,4,4,0,0,0,0,0,0,0,0,4};
     assignment(H.m[8],av);
-    av={1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0};
+    av={3,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0};
     assignment(H.m[9],av);
 
     matrix T=H.cut(13,0,19,6);
     matrix Ti=T.inv();
+    Ti.output();
+    endl();
     matrix E=H.cut(13,7,19,9);
     matrix B=H.cut(10,0,12,6);
     matrix D=H.cut(10,7,12,9);
     matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
+    fi.output();
+    endl();
     matrix fii=fi.inv();
+    fii.output();
+    endl();
     matrix A=H.cut(0,0,9,6);
     matrix C=H.cut(0,7,9,9);
 
@@ -121,17 +131,17 @@ int main()
 
         matrix sT=s.transpose();
 
-        matrix ii=E.dot(Ti);
+        matrix ii=E.elmMulInv().dot(Ti);
         ii=ii.dot(A);
         ii=ii.add(C);
         ii=ii.dot(sT);
-        matrix p1=fii.dot(ii);
+        matrix p1=fii.elmMulInv().dot(ii);
         p1=p1.transpose();
 
-        ii=A.dot(sT);
+        ii=A.elmMulInv().dot(sT);
         matrix ii2=B.dot(p1.transpose());
         ii=ii.add(ii2);
-        matrix p2=Ti.dot(ii);
+        matrix p2=Ti.elmMulInv().dot(ii);
         p2=p2.transpose();
 
         if(!check(s,p1,p2,H))
