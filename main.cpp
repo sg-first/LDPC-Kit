@@ -61,16 +61,18 @@ bool check(matrix s,matrix p1,matrix p2,matrix H)
         c.m[0][i]=p1.m[0][i-10];
     for(unsigned int i=13;i<20;i++)
         c.m[0][i]=p2.m[0][i-13];
-    std::cout<<"check:"<<std::endl;
+    //std::cout<<"check:"<<std::endl;
     s.output();
-    std::cout<<"result:"<<std::endl;
     matrix result=H.dot(c.transpose()).transpose();
-    result.output();
 
     for(unsigned int i=0;i<result.getc();i++)
     {
         if(result.m[0][i]!=0)
+        {
+            std::cout<<"result:"<<std::endl;
+            result.output();
             return false;
+        }
     }
     return true;
 }
