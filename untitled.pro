@@ -7,5 +7,6 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
+    GF.h \
     exception.h \
     matrix.h

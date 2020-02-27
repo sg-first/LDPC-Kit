@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "matrix.h"
-#include <bitset>
+#include <thread>
 
 unsigned int calu1(matrix m,unsigned int start=0)
 {
@@ -77,7 +77,7 @@ bool check(matrix s,matrix p1,matrix p2,matrix H)
     return true;
 }
 
-std::string binaryConversion(int num,int bin=vector::p)
+std::string binaryConversion(int num,int bin=GF::p)
 {
     std::string result;
     do
@@ -92,11 +92,52 @@ std::string binaryConversion(int num,int bin=vector::p)
     return result;
 }
 
-unsigned int vector::mulTable[p*p][3];
+matrix *errorMat=nullptr;
+
+void checkLoop(unsigned int min,unsigned int max,
+               matrix E,matrix Ti,matrix A,matrix C,matrix fii,matrix B,matrix H)
+{
+    matrix s(1,10);
+    for(unsigned int i=min;i<max;i++)
+    {
+        std::string as=binaryConversion(i);
+        assignment(s.m[0],as);
+
+        matrix sT=s.transpose();
+
+        matrix ii=E.elmMulInv().dot(Ti);
+        ii=ii.dot(A);
+        ii=ii.add(C);
+        ii=ii.dot(sT);
+        matrix p1=fii.elmMulInv().dot(ii);
+        p1=p1.transpose();
+
+        ii=A.elmMulInv().dot(sT);
+        matrix ii2=B.dot(p1.transpose());
+        ii=ii.add(ii2);
+        matrix p2=Ti.elmMulInv().dot(ii);
+        p2=p2.transpose();
+
+        if(!check(s,p1,p2,H))
+        {
+            std::cout<<"fail!"<<std::endl;
+            errorMat=new matrix(s);
+        }
+
+        if(errorMat!=nullptr)
+            return;
+    }
+    std::cout<<"finished!"<<std::endl;
+}
+
+/*std::tuple<unsigned int,vector<> > tetracyclicDetection(matrix H)
+{
+    for()
+}*/
 
 int main()
 {
-    vector::initMulTable();
+    GF::initMulTable();
 
     std::vector<int>av;
     matrix H(10,20);
@@ -139,31 +180,20 @@ int main()
     matrix A=H.cut(0,0,9,6);
     matrix C=H.cut(0,7,9,9);
 
-    matrix s(1,10);
-    for(unsigned int i=0;i<1073741823;i++)
+    unsigned int now=257104400;
+    unsigned int last=1073741823;
+    const unsigned int threadNum=100;
+    unsigned int every=(last-now)/threadNum;
+    std::thread *t[threadNum];
+    for(unsigned int i=0;i<threadNum-1;i++)
     {
-        std::string as=binaryConversion(i);
-        assignment(s.m[0],as);
-
-        matrix sT=s.transpose();
-
-        matrix ii=E.elmMulInv().dot(Ti);
-        ii=ii.dot(A);
-        ii=ii.add(C);
-        ii=ii.dot(sT);
-        matrix p1=fii.elmMulInv().dot(ii);
-        p1=p1.transpose();
-
-        ii=A.elmMulInv().dot(sT);
-        matrix ii2=B.dot(p1.transpose());
-        ii=ii.add(ii2);
-        matrix p2=Ti.elmMulInv().dot(ii);
-        p2=p2.transpose();
-
-        if(!check(s,p1,p2,H))
-        {
-            std::cout<<"fail!";
-            break;
-        }
+        t[i]=new std::thread([=](){checkLoop(now,now+every,E,Ti,A,C,fii,B,H);});
+        now+=every;
     }
+    t[threadNum-1]=new std::thread([=](){checkLoop(now,last,E,Ti,A,C,fii,B,H);});
+
+    for(unsigned int i=0;i<threadNum-1;i++)
+        t[i]->join();
+    if(errorMat!=nullptr)
+        errorMat->output();
 }
