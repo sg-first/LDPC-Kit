@@ -8,5 +8,6 @@ SOURCES += \
 
 HEADERS += \
     GF.h \
+    errorCorrection.h \
     exception.h \
     matrix.h
