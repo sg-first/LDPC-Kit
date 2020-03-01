@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "matrix.h"
+#include "errorCorrection.h"
 #include <thread>
 #include <map>
 #include <array>
@@ -65,18 +66,8 @@ bool check(matrix s,matrix p1,matrix p2,matrix H)
         c.m[0][i]=p2.m[0][i-13];
     //std::cout<<"check:"<<std::endl;
     s.output();
-    matrix result=H.dot(c.transpose()).transpose();
 
-    for(uint i=0;i<result.getc();i++)
-    {
-        if(result.m[0][i]!=0)
-        {
-            std::cout<<"result:"<<std::endl;
-            result.output();
-            return false;
-        }
-    }
-    return true;
+    return errorCorrection::check(c,H);
 }
 
 std::string binaryConversion(int num,int bin=GF::p)
