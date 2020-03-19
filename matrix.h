@@ -556,7 +556,7 @@ public:
             {
                 for (unsigned int j = 0; j < c; j++)
                 {
-                    printf("%g\t", m[i][j]);
+                    printf("%g ", m[i][j]);
                 }
                 printf("\n");
             }

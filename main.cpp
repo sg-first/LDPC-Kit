@@ -6,6 +6,8 @@
 #include <map>
 #include <array>
 
+#include <ctime>
+
 uint calu1(matrix m,uint start=0)
 {
     uint result=0;
@@ -64,8 +66,9 @@ bool check(matrix s,matrix p1,matrix p2,matrix H)
         c.m[0][i]=p1.m[0][i-10];
     for(uint i=13;i<20;i++)
         c.m[0][i]=p2.m[0][i-13];
-    //std::cout<<"check:"<<std::endl;
+    std::cout<<"check:"<<std::endl;
     s.output();
+    c.output();
 
     return errorCorrection::check(c,H);
 }
@@ -87,14 +90,22 @@ std::string binaryConversion(int num,int bin=GF::p)
 
 matrix *errorMat=nullptr;
 
+std::string randstr()
+{
+    std::string result="";
+    for(uint i=0;i<10;i++)
+        result+=std::to_string(std::rand() % 8);
+    return result;
+}
+
 void checkLoop(uint min,uint max,
                matrix E,matrix Ti,matrix A,matrix C,matrix fii,matrix B,matrix H)
 {
     matrix s(1,10);
     for(uint i=min;i<max;i++)
     {
-        std::string as=binaryConversion(i);
-        assignment(s.m[0],as);
+        //std::string as=binaryConversion(i);
+        assignment(s.m[0],randstr());
 
         matrix sT=s.transpose();
 
@@ -217,9 +228,11 @@ int main()
     matrix A=H.cut(0,0,9,6);
     matrix C=H.cut(0,7,9,9);
 
+    checkLoop(0,50,E,Ti,A,C,fii,B,H);
+    /*
     uint now=257104400;
     uint last=1073741823;
-    const uint threadNum=100;
+    const uint threadNum=1;
     uint every=(last-now)/threadNum;
     std::thread *t[threadNum];
     for(uint i=0;i<threadNum-1;i++)
@@ -227,10 +240,10 @@ int main()
         t[i]=new std::thread([=](){checkLoop(now,now+every,E,Ti,A,C,fii,B,H);});
         now+=every;
     }
-    t[threadNum-1]=new std::thread([=](){checkLoop(now,last,E,Ti,A,C,fii,B,H);});
+    //t[threadNum-1]=new std::thread([=](){checkLoop(now,last,E,Ti,A,C,fii,B,H);});
 
     for(uint i=0;i<threadNum-1;i++)
         t[i]->join();
     if(errorMat!=nullptr)
-        errorMat->output();
+        errorMat->output();*/
 }
