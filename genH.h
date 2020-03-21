@@ -88,6 +88,11 @@ public:
         }
     }
 
+    static int randNum(int max,int min=0)
+    {
+        return (rand()%(max-min))+min;
+    }
+
     void permutationGF()
     {
         uint max=pow(2,pExp);
@@ -99,7 +104,7 @@ public:
                 for(uint j=0;j<9;j++)
                 {
                     if(diagi->m[i][j]!=0)
-                        diagi->m[i][j]=rand()%max;
+                        diagi->m[i][j]=randNum(max);
                 }
             }
         }
@@ -115,11 +120,11 @@ public:
         }
         matArray oldDiag=copyDiag(this->diag);
         //右移
-        uint moveNum=(rand()%genH::diagSize-1)+1; //最少一个，最多比全部少一个
+        uint moveNum=randNum(genH::diagSize,1); //最少一个，最多比全部少一个
         for(uint ii=0;ii<moveNum;ii++) //对随机个小矩阵右移
         {
-            uint moveSub=rand()%genH::diagSize; //随机选择要右移的小矩阵，第几个都行
-            for(uint i=0;i<(rand()%8)+1;i++) //每个右移随机次，最少一次
+            uint moveSub=randNum(genH::diagSize); //随机选择要右移的小矩阵，第几个都行
+            for(uint i=0;i<randNum(9,1);i++) //每个右移随机次，最少一次
                 this->rightMove(moveSub);
         }
         //检测新的四环
@@ -182,6 +187,5 @@ public:
 
         return result;
     }
-
 
 };

@@ -190,7 +190,7 @@ int main()
         hg.moveDetection();
     hg.permutationGF();
     hg.tetracyclicNum=-1; //重新给四环计数
-    for(uint i=0;i<1500;i++)
+    for(uint i=0;i<1000;i++)
         hg.moveDetection();
     hg.getH().output();
 }
