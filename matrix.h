@@ -292,6 +292,16 @@ public:
             return ret;
         }
 
+        void setArea(unsigned int y1,unsigned int x1,unsigned int y2,unsigned int x2,
+                       const matrix &m)
+        {
+            for(unsigned int x=0;x+x1<x2;x++)
+            {
+                for(unsigned int y=0;y+y1<y2;y++)
+                    this->m[y+y1][x+x1]=m.m[y][x];
+            }
+        }
+
         matrix inv() const
         {
             double d=this->det();

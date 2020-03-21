@@ -5,8 +5,8 @@
 #include <thread>
 #include <map>
 #include <array>
-
 #include <ctime>
+#include "genH.h"
 
 uint calu1(matrix m,uint start=0)
 {
@@ -134,54 +134,9 @@ void checkLoop(uint min,uint max,
     std::cout<<"finished!"<<std::endl;
 }
 
-
-typedef std::array<uint,4> cycle;
-std::vector<cycle> tetracyclicDetection(matrix H)
-{
-    std::vector<cycle> result;
-
-    auto updateCD=[](std::map<uint,std::vector<uint>> &allCD,uint b,uint pos) //map first是元素，second是所有位置
-    {
-        if (allCD.count(b) == 0) //没有
-            allCD[b]=std::vector<uint>();
-        allCD[b].push_back(pos);
-    };
-
-    auto deteGroup=[&](uint p1,uint p2,uint b,uint nowi)
-    {
-        for(uint i=nowi+1;i<H.getr();i++)
-        {
-            if(H.m[i][p1]==b && H.m[i][p2]==b)
-                result.push_back({nowi,p1,i,p2});
-        }
-    };
-
-    auto deteAllGroup=[deteGroup](const std::vector<uint> &allp,uint b,uint nowi)
-    {
-        for(uint i=0;i<allp.size()-1;i++)
-            for(uint j=i+1;j<allp.size();j++)
-                deteGroup(allp[i],allp[j],b,nowi);
-    };
-
-    for(uint i=0;i<H.getr();i++)
-    {
-        std::map<uint,std::vector<uint>> allCD;
-        for(uint j=0;j<H.getc();j++)
-        {
-            if(H.m[i][j]!=0)
-                updateCD(allCD,H.m[i][j],j); //找同行一样的
-        }
-        //所有一样的找到，开始检测
-        for (auto iter=allCD.begin(); iter!=allCD.end(); iter++)
-            deteAllGroup(iter->second,iter->first,i);
-    }
-
-    return result;
-}
-
 int main()
 {
-    GF::initMulTable();
+    /*GF::initMulTable();
 
     std::vector<int>av;
     matrix H(10,20);
@@ -228,22 +183,15 @@ int main()
     matrix A=H.cut(0,0,9,6);
     matrix C=H.cut(0,7,9,9);
 
-    checkLoop(0,50,E,Ti,A,C,fii,B,H);
-    /*
-    uint now=257104400;
-    uint last=1073741823;
-    const uint threadNum=1;
-    uint every=(last-now)/threadNum;
-    std::thread *t[threadNum];
-    for(uint i=0;i<threadNum-1;i++)
-    {
-        t[i]=new std::thread([=](){checkLoop(now,now+every,E,Ti,A,C,fii,B,H);});
-        now+=every;
-    }
-    //t[threadNum-1]=new std::thread([=](){checkLoop(now,last,E,Ti,A,C,fii,B,H);});
+    checkLoop(0,50,E,Ti,A,C,fii,B,H);*/
 
-    for(uint i=0;i<threadNum-1;i++)
-        t[i]->join();
-    if(errorMat!=nullptr)
-        errorMat->output();*/
+    HGenerator hg;
+    hg.diag[0]->output();
+    hg.getH().output();
+    hg.rightMove(0);
+    std::cout<<std::endl;
+    hg.diag[0]->output();
+    hg.getH().output();
+    for(uint i=0;i<500;i++)
+        hg.moveDetection();
 }

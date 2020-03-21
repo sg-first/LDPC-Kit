@@ -10,4 +10,5 @@ HEADERS += \
     GF.h \
     errorCorrection.h \
     exception.h \
+    genH.h \
     matrix.h
