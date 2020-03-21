@@ -186,12 +186,11 @@ int main()
     checkLoop(0,50,E,Ti,A,C,fii,B,H);*/
 
     HGenerator hg;
-    hg.diag[0]->output();
-    hg.getH().output();
-    hg.rightMove(0);
-    std::cout<<std::endl;
-    hg.diag[0]->output();
-    hg.getH().output();
-    for(uint i=0;i<500;i++)
+    for(uint i=0;i<750;i++)
         hg.moveDetection();
+    hg.permutationGF();
+    hg.tetracyclicNum=-1; //重新给四环计数
+    for(uint i=0;i<1500;i++)
+        hg.moveDetection();
+    hg.getH().output();
 }

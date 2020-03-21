@@ -88,30 +88,49 @@ public:
         }
     }
 
+    void permutationGF()
+    {
+        uint max=pow(2,pExp);
+        for(uint sub=0;sub<genH::diagSize;sub++)
+        {
+            auto& diagi=this->diag[sub];
+            for(uint i=0;i<9;i++)
+            {
+                for(uint j=0;j<9;j++)
+                {
+                    if(diagi->m[i][j]!=0)
+                        diagi->m[i][j]=rand()%max;
+                }
+            }
+        }
+    }
+
     void moveDetection()
     {
         if(this->tetracyclicNum==-1)
         {
             matrix oldH=getH(this->diag);
             this->tetracyclicNum=tetracyclicDetection(oldH).size();
+            std::cout<<"first:"<<this->tetracyclicNum<<std::endl;
         }
         matArray oldDiag=copyDiag(this->diag);
         //右移
-        uint moveNum=rand()%9;
-        for(uint ii=0;ii<moveNum;ii++) //对所有小矩阵右移
+        uint moveNum=(rand()%genH::diagSize-1)+1; //最少一个，最多比全部少一个
+        for(uint ii=0;ii<moveNum;ii++) //对随机个小矩阵右移
         {
-            for(uint i=0;i<genH::diagSize;i++)
-                this->rightMove(i);
+            uint moveSub=rand()%genH::diagSize; //随机选择要右移的小矩阵，第几个都行
+            for(uint i=0;i<(rand()%8)+1;i++) //每个右移随机次，最少一次
+                this->rightMove(moveSub);
         }
         //检测新的四环
         matrix newH=getH(this->diag);
         int newTcNum=tetracyclicDetection(newH).size();
-        std::cout<<"new:"<<newTcNum<<std::endl;
-        if(newTcNum>this->tetracyclicNum)
+        std::cout<<newTcNum<<std::endl;
+        if(newTcNum<this->tetracyclicNum) //新的四环更少，换
         {
             this->tetracyclicNum=newTcNum;
             deleteDiag(oldDiag);
-            std::cout<<this->tetracyclicNum<<std::endl;
+            std::cout<<"new:"<<this->tetracyclicNum<<std::endl;
         }
         else
         {
