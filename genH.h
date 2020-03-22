@@ -110,7 +110,7 @@ public:
         }
     }
 
-    void moveDetection()
+    bool moveDetection()
     {
         if(this->tetracyclicNum==-1)
         {
@@ -136,12 +136,14 @@ public:
             this->tetracyclicNum=newTcNum;
             deleteDiag(oldDiag);
             std::cout<<"new:"<<this->tetracyclicNum<<std::endl;
+            return true;
         }
         else
         {
             //this.diag恢复原来的
             deleteDiag(this->diag);
             this->diag=oldDiag;
+            return false;
         }
     }
 

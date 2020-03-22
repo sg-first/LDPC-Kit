@@ -190,7 +190,13 @@ int main()
         hg.moveDetection();
     hg.permutationGF();
     hg.tetracyclicNum=-1; //重新给四环计数
-    for(uint i=0;i<2000;i++)
-        hg.moveDetection();
+    uint usefulNum;
+    for(uint i=0;i<50000;i++)
+    {
+        if(hg.moveDetection())
+            usefulNum=i;
+    }
+    std::cout<<"result:"<<hg.tetracyclicNum<<std::endl;
+    std::cout<<"last:"<<50000-usefulNum<<std::endl;
     hg.getH().output();
 }
