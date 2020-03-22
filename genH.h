@@ -104,7 +104,7 @@ public:
                 for(uint j=0;j<9;j++)
                 {
                     if(diagi->m[i][j]!=0)
-                        diagi->m[i][j]=randNum(max);
+                        diagi->m[i][j]=randNum(max,1);
                 }
             }
         }
