@@ -7,6 +7,7 @@
 #include <array>
 #include <ctime>
 #include "genH.h"
+#include "matIO.h"
 
 uint calu1(matrix m,uint start=0)
 {
@@ -20,39 +21,6 @@ uint calu1(matrix m,uint start=0)
         }
     }
     return result;
-}
-
-void assignment(double* v,std::vector<int> av)
-{
-    for(uint i=0;i<av.size();i++)
-        v[i]=av[i];
-}
-
-void assignment(double* v,std::string as)
-{
-    for(uint i=0;i<as.size();i++)
-        v[i]=as[i]-48;
-}
-
-void inputElm(matrix& m)
-{
-    for(uint i=0;i<m.getr();i++)
-    {
-        for(uint j=0;j<m.getc();j++)
-            std::cin>>m.m[i][j];
-    }
-}
-
-matrix inputM()
-{
-    uint r,c;
-    std::cout<<"r:";
-    std::cin>>r;
-    std::cout<<"c:";
-    std::cin>>c;
-    matrix m(r,c);
-    inputElm(m);
-    return m;
 }
 
 void endl() { std::cout<<std::endl; }
@@ -105,7 +73,7 @@ void checkLoop(uint min,uint max,
     for(uint i=min;i<max;i++)
     {
         //std::string as=binaryConversion(i);
-        assignment(s.m[0],randstr());
+        matIO::assignment(s.m[0],randstr());
 
         matrix sT=s.transpose();
 
@@ -136,6 +104,7 @@ void checkLoop(uint min,uint max,
 
 int main()
 {
+    //编码
     /*GF::initMulTable();
 
     std::vector<int>av;
@@ -185,7 +154,8 @@ int main()
 
     checkLoop(0,50,E,Ti,A,C,fii,B,H);*/
 
-    HGenerator hg;
+    //生成矩阵
+    /*HGenerator hg;
     for(uint i=0;i<750;i++)
         hg.moveDetection();
     hg.permutationGF();
@@ -198,5 +168,31 @@ int main()
     }
     std::cout<<"result:"<<hg.tetracyclicNum<<std::endl;
     std::cout<<"last:"<<50000-usefulNum<<std::endl;
-    hg.getH().output();
+    hg.getH().output();*/
+
+    matrix H=matIO::ReadMatFile("D:/27×1395校验矩阵.csv",genH::r,genH::c);
+    auto cy=HGenerator::tetracyclicDetection(H);
+    uint ary[8];
+
+    uint pushNum=0;
+    for(auto i : cy)
+    {
+        ary[pushNum]=i[1];
+        pushNum++;
+        ary[pushNum]=i[3];
+        pushNum++;
+    }
+
+    matrix newH(1,1);
+    for(uint i=0;i<7;i++)
+    {
+        for(uint j=i+1;j<8;j++)
+        {
+            newH=H.delC(ary[i],ary[j]);
+            cy=HGenerator::tetracyclicDetection(newH);
+            std::cout<<ary[i]<<" "<<ary[j]<<": ";
+            std::cout<<cy.size()<<std::endl;
+        }
+    }
+    newH.output();
 }

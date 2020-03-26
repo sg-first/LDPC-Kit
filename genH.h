@@ -147,7 +147,7 @@ public:
         }
     }
 
-    std::vector<cycle> tetracyclicDetection(matrix H)
+    static std::vector<cycle> tetracyclicDetection(const matrix& H)
     {
         std::vector<cycle> result;
 

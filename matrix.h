@@ -178,8 +178,8 @@ public:
             return *this;
         }
 
-        unsigned int getr() { return r; }
-        unsigned int getc() { return c; }
+        unsigned int getr() const { return r; }
+        unsigned int getc() const { return c; }
 
         vector getRVector(unsigned int rn) const
         {
@@ -263,6 +263,23 @@ public:
                 }
                 return result;
             }
+        }
+
+        matrix delC(uint ci1, uint ci2)
+        {
+            matrix m(this->r,this->c-2);
+            uint findNum=0;
+            for (unsigned int j = 0; j < c-2; j++)
+            {
+                if(j!=ci1 && j!=ci2)
+                {
+                    for (unsigned int i = 0; i < r; i++)
+                        m.m[i][j] = this->m[i][j+findNum];
+                }
+                else
+                    findNum++;
+            }
+            return m;
         }
 
         matrix adjoint() const
