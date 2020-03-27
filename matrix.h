@@ -96,7 +96,7 @@ public:
         {
             for (unsigned int i = 0; i < l; i++)
             {
-                printf("%g\t", v[i]);
+                printf("%g ", v[i]);
             }
             printf("\n");
         }
@@ -271,13 +271,10 @@ public:
             uint findNum=0;
             for (unsigned int j = 0; j < c-2; j++)
             {
-                if(j!=ci1 && j!=ci2)
-                {
-                    for (unsigned int i = 0; i < r; i++)
-                        m.m[i][j] = this->m[i][j+findNum];
-                }
-                else
+                if(j==ci1 || j+1==ci2)
                     findNum++;
+                for (unsigned int i = 0; i < r; i++)
+                    m.m[i][j] = this->m[i][j+findNum];
             }
             return m;
         }

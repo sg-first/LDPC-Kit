@@ -190,9 +190,17 @@ int main()
         {
             newH=H.delC(ary[i],ary[j]);
             cy=HGenerator::tetracyclicDetection(newH);
+            /*auto v1=H.getCVector(ary[j]+1);
+            auto v4=H.getCVector(ary[j]);
+            auto v3=H.getCVector(ary[j-1]);
+            auto v2=newH.getCVector(ary[j]);
+            v1.output();
+            v4.output();
+            v3.output();
+            v2.output();*/
             std::cout<<ary[i]<<" "<<ary[j]<<": ";
             std::cout<<cy.size()<<std::endl;
         }
     }
-    newH.output();
+    //newH.output();
 }
