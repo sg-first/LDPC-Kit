@@ -105,34 +105,34 @@ void checkLoop(uint min,uint max,
 int main()
 {
     //编码
-    /*GF::initMulTable();
+    GF::initMulTable();
 
     std::vector<int>av;
     matrix H(10,20);
     av={2,2,0,0,0,2,0,0,0,0,2,0,2,2,0,0,0,0,0,0};
-    assignment(H.m[0],av);
+    matIO::assignment(H.m[0],av);
     av={0,0,0,0,4,0,4,0,4,0,0,4,0,4,4,0,0,0,0,0};
-    assignment(H.m[1],av);
+    matIO::assignment(H.m[1],av);
     av={0,3,0,3,0,0,0,3,0,0,3,0,0,0,3,3,0,0,0,0};
-    assignment(H.m[2],av);
+    matIO::assignment(H.m[2],av);
     av={0,0,1,0,0,0,1,0,6,0,0,0,6,0,0,6,6,0,0,0};
-    assignment(H.m[3],av);
+    matIO::assignment(H.m[3],av);
     av={0,0,0,7,0,0,0,0,0,7,0,7,0,0,7,0,7,7,0,0};
-    assignment(H.m[4],av);
+    matIO::assignment(H.m[4],av);
     av={5,0,0,0,5,0,0,5,0,0,0,0,0,5,0,0,0,5,5,0};
-    assignment(H.m[5],av);
+    matIO::assignment(H.m[5],av);
     av={0,0,2,0,0,0,2,0,0,2,0,0,0,0,0,0,2,0,2,2};
-    assignment(H.m[6],av);
+    matIO::assignment(H.m[6],av);
     av={0,0,0,2,0,2,0,0,2,0,0,2,2,0,0,2,0,2,0,2};
-    assignment(H.m[7],av);
+    matIO::assignment(H.m[7],av);
     av={0,4,0,0,0,4,0,4,0,4,4,0,0,0,0,0,0,0,0,4};
-    assignment(H.m[8],av);
+    matIO::assignment(H.m[8],av);
     av={3,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0};
-    assignment(H.m[9],av);
+    matIO::assignment(H.m[9],av);
 
     H.output();
-    auto aa=tetracyclicDetection(H);
-    std::cout<<aa[0][0]<<aa[0][1]<<aa[0][2]<<aa[0][3]<<std::endl;
+    /*auto aa=HGenerator::tetracyclicDetection(H);
+    std::cout<<aa[0][0]<<aa[0][1]<<aa[0][2]<<aa[0][3]<<std::endl;*/
 
     matrix T=H.cut(13,0,19,6);
     matrix Ti=T.inv();
@@ -152,7 +152,7 @@ int main()
     matrix A=H.cut(0,0,9,6);
     matrix C=H.cut(0,7,9,9);
 
-    checkLoop(0,50,E,Ti,A,C,fii,B,H);*/
+    checkLoop(0,50,E,Ti,A,C,fii,B,H);
 
     //生成矩阵
     /*HGenerator hg;
@@ -170,7 +170,8 @@ int main()
     std::cout<<"last:"<<50000-usefulNum<<std::endl;
     hg.getH().output();*/
 
-    matrix H=matIO::ReadMatFile("D:/27×1395校验矩阵.csv",genH::r,genH::c);
+    //去掉两列
+    /*matrix H=matIO::ReadMatFile("D:/27×1395校验矩阵.csv",genH::r,genH::c);
     auto cy=HGenerator::tetracyclicDetection(H);
     uint ary[8];
 
@@ -190,17 +191,8 @@ int main()
         {
             newH=H.delC(ary[i],ary[j]);
             cy=HGenerator::tetracyclicDetection(newH);
-            /*auto v1=H.getCVector(ary[j]+1);
-            auto v4=H.getCVector(ary[j]);
-            auto v3=H.getCVector(ary[j-1]);
-            auto v2=newH.getCVector(ary[j]);
-            v1.output();
-            v4.output();
-            v3.output();
-            v2.output();*/
             std::cout<<ary[i]<<" "<<ary[j]<<": ";
             std::cout<<cy.size()<<std::endl;
         }
-    }
-    //newH.output();
+    }*/
 }
