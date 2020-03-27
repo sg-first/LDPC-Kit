@@ -9,6 +9,9 @@
 #include "genH.h"
 #include "matIO.h"
 
+const uint sLength=1366;
+const uint cLength=1393;
+
 uint calu1(matrix m,uint start=0)
 {
     uint result=0;
@@ -27,13 +30,14 @@ void endl() { std::cout<<std::endl; }
 
 bool check(matrix s,matrix p1,matrix p2,matrix H)
 {
-    matrix c(1,20);
-    for(uint i=0;i<10;i++)
+    matrix c(1,cLength);
+    for(uint i=0;i<sLength;i++) //信息位逐个拷贝
         c.m[0][i]=s.m[0][i];
-    for(uint i=10;i<13;i++)
-        c.m[0][i]=p1.m[0][i-10];
-    for(uint i=13;i<20;i++)
-        c.m[0][i]=p2.m[0][i-13];
+    for(uint i=sLength ; i<sLength+p1.getc() ; i++) //校验位1
+        c.m[0][i]=p1.m[0][i-sLength];
+    const uint offest2=sLength+p1.getc();
+    for(uint i=offest2 ; i<cLength ; i++) //校验位2
+        c.m[0][i]=p2.m[0][i-offest2];
     std::cout<<"check:"<<std::endl;
     s.output();
     c.output();
@@ -61,7 +65,7 @@ matrix *errorMat=nullptr;
 std::string randstr()
 {
     std::string result="";
-    for(uint i=0;i<10;i++)
+    for(uint i=0;i<sLength;i++)
         result+=std::to_string(std::rand() % 8);
     return result;
 }
@@ -69,11 +73,11 @@ std::string randstr()
 void checkLoop(uint min,uint max,
                matrix E,matrix Ti,matrix A,matrix C,matrix fii,matrix B,matrix H)
 {
-    matrix s(1,10);
+    matrix s(1,sLength);
     for(uint i=min;i<max;i++)
     {
         //std::string as=binaryConversion(i);
-        matIO::assignment(s.m[0],randstr());
+        matIO::assignment(s.m[0],randstr(),s.getc());
 
         matrix sT=s.transpose();
 
@@ -108,49 +112,31 @@ int main()
     GF::initMulTable();
 
     std::vector<int>av;
-    matrix H(10,20);
-    av={2,2,0,0,0,2,0,0,0,0,2,0,2,2,0,0,0,0,0,0};
-    matIO::assignment(H.m[0],av);
-    av={0,0,0,0,4,0,4,0,4,0,0,4,0,4,4,0,0,0,0,0};
-    matIO::assignment(H.m[1],av);
-    av={0,3,0,3,0,0,0,3,0,0,3,0,0,0,3,3,0,0,0,0};
-    matIO::assignment(H.m[2],av);
-    av={0,0,1,0,0,0,1,0,6,0,0,0,6,0,0,6,6,0,0,0};
-    matIO::assignment(H.m[3],av);
-    av={0,0,0,7,0,0,0,0,0,7,0,7,0,0,7,0,7,7,0,0};
-    matIO::assignment(H.m[4],av);
-    av={5,0,0,0,5,0,0,5,0,0,0,0,0,5,0,0,0,5,5,0};
-    matIO::assignment(H.m[5],av);
-    av={0,0,2,0,0,0,2,0,0,2,0,0,0,0,0,0,2,0,2,2};
-    matIO::assignment(H.m[6],av);
-    av={0,0,0,2,0,2,0,0,2,0,0,2,2,0,0,2,0,2,0,2};
-    matIO::assignment(H.m[7],av);
-    av={0,4,0,0,0,4,0,4,0,4,4,0,0,0,0,0,0,0,0,4};
-    matIO::assignment(H.m[8],av);
-    av={3,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0};
-    matIO::assignment(H.m[9],av);
+    matrix H=matIO::ReadMatFile("D:/27×1393校验矩阵.csv",genH::r,genH::c-2);
+    uint g=27-9;
+    uint mg=H.getr()-g;
+    uint nm=H.getc()-H.getr();
 
-    H.output();
-    /*auto aa=HGenerator::tetracyclicDetection(H);
-    std::cout<<aa[0][0]<<aa[0][1]<<aa[0][2]<<aa[0][3]<<std::endl;*/
-
-    matrix T=H.cut(13,0,19,6);
+    matrix T=H.cut(nm+g,0,H.getc()-1,mg-1);
+    //T.output();
     matrix Ti=T.inv();
     Ti.output();
     endl();
-    matrix E=H.cut(13,7,19,9);
-    matrix B=H.cut(10,0,12,6);
-    matrix D=H.cut(10,7,12,9);
-    matrix fi=E.dot(Ti);
+    matrix E=H.cut(nm+g,mg,H.getc()-1,H.getr()-1);
+    matrix B=H.cut(nm,0,nm+g-1,mg-1);
+    matrix D=H.cut(nm,mg,nm+g-1,H.getr()-1);
+    /*matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
     fi.output();
-    endl();
-    matrix fii=fi.inv();
+    endl();*/
+
+    //matrix fii=fi.inv();
+    matrix fii=matIO::ReadMatFile("D:/fii.csv",18,18);
     fii.output();
     endl();
-    matrix A=H.cut(0,0,9,6);
-    matrix C=H.cut(0,7,9,9);
+    matrix A=H.cut(0,0,nm-1,mg-1);
+    matrix C=H.cut(0,mg,nm-1,H.getr()-1);
 
     checkLoop(0,50,E,Ti,A,C,fii,B,H);
 
@@ -170,9 +156,14 @@ int main()
     std::cout<<"last:"<<50000-usefulNum<<std::endl;
     hg.getH().output();*/
 
+    //最大下三角
+    /*matrix H=matIO::ReadMatFile("D:/27×1393校验矩阵.csv",genH::r,genH::c-2);
+    H.maxTri();
+    H.output();
+    std::cout<<HGenerator::tetracyclicDetection(H).size()<<std::endl;*/
+
     //去掉两列
-    /*matrix H=matIO::ReadMatFile("D:/27×1395校验矩阵.csv",genH::r,genH::c);
-    auto cy=HGenerator::tetracyclicDetection(H);
+    /*auto cy=HGenerator::tetracyclicDetection(H);
     uint ary[8];
 
     uint pushNum=0;

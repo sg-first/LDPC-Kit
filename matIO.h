@@ -13,9 +13,9 @@ public:
             v[i]=av[i];
     }
 
-    static void assignment(double* v,std::string as)
+    static void assignment(double* v,std::string as,uint c)
     {
-        for(uint i=0;i<as.size();i++)
+        for(uint i=0;i<c;i++)
             v[i]=as[i]-48;
     }
 
@@ -56,9 +56,10 @@ public:
     {
         matrix m(r,c);
         QString content=ReadTXT(path);
+        content.replace(",","");
         QStringList allLine=content.split('\n');
         for(uint i=0;i<r;i++)
-            assignment(m.m[i],allLine[i].toStdString());
+            assignment(m.m[i],allLine[i].toStdString(),c);
         return m;
     }
 };
