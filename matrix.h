@@ -322,16 +322,6 @@ public:
             return this->adjoint().mul(GF::mulInv(d));
         }
 
-        matrix elmMulInv()
-        {
-            /*matrix result(this->r,this->c);
-            for (unsigned int i = 0; i < this->r; i++)
-                for (unsigned int j = 0; j < this->c; j++)
-                    result.m[i][j]=vector::mulInv(this->m[i][j]);
-            return result;*/
-            return *this;
-        }
-
         matrix dot(const matrix &m2) const
         {
             if (this->c != m2.r)

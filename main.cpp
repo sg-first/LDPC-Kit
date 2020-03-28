@@ -71,7 +71,8 @@ std::string randstr()
 }
 
 void checkLoop(uint min,uint max,
-               matrix E,matrix Ti,matrix A,matrix C,matrix fii,matrix B,matrix H)
+               matrix fii_ETiA_C, matrix TiA, matrix TiB,
+               matrix H)
 {
     matrix s(1,sLength);
     for(uint i=min;i<max;i++)
@@ -81,20 +82,13 @@ void checkLoop(uint min,uint max,
 
         matrix sT=s.transpose();
 
-        matrix ii=E.elmMulInv().dot(Ti);
-        ii=ii.dot(A);
-        ii=ii.add(C);
-        ii=ii.dot(sT);
-        matrix p1=fii.elmMulInv().dot(ii);
-        p1=p1.transpose();
+        matrix p1T=fii_ETiA_C.dot(sT);
 
-        ii=A.elmMulInv().dot(sT);
-        matrix ii2=B.dot(p1.transpose());
-        ii=ii.add(ii2);
-        matrix p2=Ti.elmMulInv().dot(ii);
-        p2=p2.transpose();
+        matrix ii=TiA.dot(sT);
+        matrix ii2=TiB.dot(p1T);
+        matrix p2T=ii.add(ii2);
 
-        if(!check(s,p1,p2,H))
+        if(!check(s,p1T.transpose(),p2T.transpose(),H))
         {
             std::cout<<"fail!"<<std::endl;
             errorMat=new matrix(s);
@@ -118,27 +112,44 @@ int main()
     uint nm=H.getc()-H.getr();
 
     matrix T=H.cut(nm+g,0,H.getc()-1,mg-1);
-    //T.output();
+    T.output();
     matrix Ti=T.inv();
+    std::cout<<"Ti:"<<std::endl;
     Ti.output();
-    endl();
     matrix E=H.cut(nm+g,mg,H.getc()-1,H.getr()-1);
+    std::cout<<"E:"<<std::endl;
+    E.output();
     matrix B=H.cut(nm,0,nm+g-1,mg-1);
+    std::cout<<"B:"<<std::endl;
+    B.output();
     matrix D=H.cut(nm,mg,nm+g-1,H.getr()-1);
+    std::cout<<"D:"<<std::endl;
+    D.output();
     /*matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
     fi.output();
     endl();*/
-
     //matrix fii=fi.inv();
     matrix fii=matIO::ReadMatFile("D:/fii.csv",18,18);
-    fii.output();
-    endl();
     matrix A=H.cut(0,0,nm-1,mg-1);
     matrix C=H.cut(0,mg,nm-1,H.getr()-1);
 
-    checkLoop(0,50,E,Ti,A,C,fii,B,H);
+    //计算所需
+    matrix fii_ETiA_C=E.dot(Ti).dot(A).add(C);
+    fii_ETiA_C=fii.dot(fii_ETiA_C); //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
+    std::cout<<"fii_ETiA_C:"<<std::endl;
+    fii_ETiA_C.output();
+
+    matrix TiA=Ti.dot(A);  //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
+    std::cout<<"TiA:"<<std::endl;
+    TiA.output();
+
+    matrix TiB=Ti.dot(B);  //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
+    std::cout<<"TiB:"<<std::endl;
+    TiB.output();
+
+    checkLoop(0,50,fii_ETiA_C,TiA,TiB,H);
 
     //生成矩阵
     /*HGenerator hg;
