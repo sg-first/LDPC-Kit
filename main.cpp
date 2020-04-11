@@ -9,8 +9,8 @@
 #include "genH.h"
 #include "matIO.h"
 
-const uint sLength=1366;
-const uint cLength=1393;
+const uint sLength=10;
+const uint cLength=20;
 
 uint calu1(matrix m,uint start=0)
 {
@@ -106,8 +106,29 @@ int main()
     GF::initMulTable();
 
     std::vector<int>av;
-    matrix H=matIO::ReadMatFile("D:/27×1393校验矩阵.csv",genH::r,genH::c-2);
-    uint g=27-9;
+    matrix H(10,20);
+    av={2,2,0,0,0,2,0,0,0,0,2,0,2,2,0,0,0,0,0,0};
+    matIO::assignment(H.m[0],av);
+    av={0,0,0,0,4,0,4,0,4,0,0,4,0,4,4,0,0,0,0,0};
+    matIO::assignment(H.m[1],av);
+    av={0,3,0,3,0,0,0,3,0,0,3,0,0,0,3,3,0,0,0,0};
+    matIO::assignment(H.m[2],av);
+    av={0,0,1,0,0,0,1,0,6,0,0,0,6,0,0,6,6,0,0,0};
+    matIO::assignment(H.m[3],av);
+    av={0,0,0,7,0,0,0,0,0,7,0,7,0,0,7,0,7,7,0,0};
+    matIO::assignment(H.m[4],av);
+    av={5,0,0,0,5,0,0,5,0,0,0,0,0,5,0,0,0,5,5,0};
+    matIO::assignment(H.m[5],av);
+    av={0,0,2,0,0,0,2,0,0,2,0,0,0,0,0,0,2,0,2,2};
+    matIO::assignment(H.m[6],av);
+    av={0,0,0,2,0,2,0,0,2,0,0,2,2,0,0,2,0,2,0,2};
+    matIO::assignment(H.m[7],av);
+    av={0,4,0,0,0,4,0,4,0,4,4,0,0,0,0,0,0,0,0,4};
+    matIO::assignment(H.m[8],av);
+    av={3,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0};
+    matIO::assignment(H.m[9],av);
+
+    uint g=H.getr()-7;
     uint mg=H.getr()-g;
     uint nm=H.getc()-H.getr();
 
@@ -125,13 +146,13 @@ int main()
     matrix D=H.cut(nm,mg,nm+g-1,H.getr()-1);
     std::cout<<"D:"<<std::endl;
     D.output();
-    /*matrix fi=E.dot(Ti);
+    matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
     fi.output();
-    endl();*/
-    //matrix fii=fi.inv();
-    matrix fii=matIO::ReadMatFile("D:/fii.csv",18,18);
+    endl();
+    matrix fii=fi.inv();
+    //matrix fii=matIO::ReadMatFile("D:/fii.csv",18,18);
     matrix A=H.cut(0,0,nm-1,mg-1);
     matrix C=H.cut(0,mg,nm-1,H.getr()-1);
 
