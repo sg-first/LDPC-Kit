@@ -105,7 +105,7 @@ int main()
     //编码
     GF::initMulTable();
 
-    std::vector<int>av;
+    /*std::vector<int>av;
     matrix H(10,20);
     av={2,2,0,0,0,2,0,0,0,0,2,0,2,2,0,0,0,0,0,0};
     matIO::assignment(H.m[0],av);
@@ -170,11 +170,11 @@ int main()
     std::cout<<"TiB:"<<std::endl;
     TiB.output();
 
-    checkLoop(0,50,fii_ETiA_C,TiA,TiB,H);
+    checkLoop(0,50,fii_ETiA_C,TiA,TiB,H);*/
 
     //生成矩阵
-    /*HGenerator hg;
-    for(uint i=0;i<750;i++)
+    HGenerator hg;
+    for(uint i=0;i<400;i++)
         hg.moveDetection();
     hg.permutationGF();
     hg.tetracyclicNum=-1; //重新给四环计数
@@ -183,10 +183,12 @@ int main()
     {
         if(hg.moveDetection())
             usefulNum=i;
+        if(hg.tetracyclicNum==0)
+            break;
     }
     std::cout<<"result:"<<hg.tetracyclicNum<<std::endl;
     std::cout<<"last:"<<50000-usefulNum<<std::endl;
-    hg.getH().output();*/
+    matIO::saveMatFile("D:/result.csv", hg.getH());
 
     //最大下三角
     /*matrix H=matIO::ReadMatFile("D:/27×1393校验矩阵.csv",genH::r,genH::c-2);

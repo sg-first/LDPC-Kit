@@ -52,6 +52,20 @@ public:
         return concert;
     }
 
+    static void writeTXT(QString path, QString content)
+    {
+        QFile file(path);
+        file.open(QIODevice::WriteOnly);
+        file.close();
+        if (file.open(QIODevice::ReadWrite | QIODevice::Text))
+        {
+            QTextStream stream(&file);
+            stream.seek(file.size());
+            stream << content;
+            file.close();
+        }
+    }
+
     static matrix ReadMatFile(QString path, uint r, uint c)
     {
         matrix m(r,c);
@@ -61,5 +75,20 @@ public:
         for(uint i=0;i<r;i++)
             assignment(m.m[i],allLine[i].toStdString(),c);
         return m;
+    }
+
+    static void saveMatFile(QString path, matrix m)
+    {
+        QString result="";
+        for(uint i=0;i<m.getr();i++)
+        {
+            for(uint j=0;j<m.getc();j++)
+            {
+                int val=m.m[i][j];
+                result+=QString::number(val)+",";
+            }
+            result+="\n";
+        }
+        writeTXT(path,result);
     }
 };

@@ -5,27 +5,28 @@
 
 namespace  genH
 {
-    const uint r=27;
-    const uint c=1395;
-    const uint diagSize=(r/9)*(c/9);
+    const uint diagSize=133;
+    const uint r=28*diagSize;
+    const uint c=3*diagSize;
+    const uint diagNum=diagSize*diagSize;
 }
 
 typedef std::array<uint,4> cycle;
-typedef std::array<matrix*,genH::diagSize> matArray;
+typedef std::array<matrix*,genH::diagNum> matArray;
 
 class HGenerator
 {
 private:
     static void deleteDiag(matArray diag)
     {
-        for(uint i=0;i<genH::diagSize;i++)
+        for(uint i=0;i<genH::diagNum;i++)
             delete diag[i];
     }
 
     static matArray copyDiag(matArray diag)
     {
         matArray rediag;
-        for(unsigned int i=0;i<genH::diagSize;i++)
+        for(unsigned int i=0;i<genH::diagNum;i++)
             rediag[i]=new matrix(*(diag[i]));
         return rediag;
     }
@@ -37,8 +38,8 @@ public:
 
     HGenerator()
     {
-        for(unsigned int i=0;i<genH::diagSize;i++)
-            this->diag[i]=new matrix(matrix::identity(9));
+        for(unsigned int i=0;i<genH::diagNum;i++)
+            this->diag[i]=new matrix(matrix::identity(genH::diagSize));
     }
 
     ~HGenerator()
@@ -50,11 +51,11 @@ public:
     {
         matrix H(genH::r,genH::c);
         uint sub=0;
-        for(uint i=0;i<H.getr();i+=9)
+        for(uint i=0;i<H.getr();i+=genH::diagSize)
         {
-            for(uint j=0;j<H.getc();j+=9)
+            for(uint j=0;j<H.getc();j+=genH::diagSize)
             {
-                H.setArea(i,j,i+9,j+9,*(diag[sub]));
+                H.setArea(i,j,i+genH::diagSize,j+genH::diagSize,*(diag[sub]));
                 sub++;
             }
         }
@@ -68,17 +69,15 @@ public:
 
     void rightMove(uint sub)
     {
-        /*uint cmax=genH::c/9;
-        uint sub=r*cmax+1+c;*/
         auto& diagi=this->diag[sub];
-        for(uint i=0;i<9;i++)
+        for(uint i=0;i<genH::diagSize;i++)
         {
-            for(uint j=0;j<9;j++)
+            for(uint j=0;j<genH::diagSize;j++)
             {
                 if(diagi->m[i][j]!=0)
                 {
                     uint nextJ=j+1;
-                    if(j==8)
+                    if(j==genH::diagSize-1)
                         nextJ=0;
                     diagi->m[i][nextJ]=diagi->m[i][j];
                     diagi->m[i][j]=0;
@@ -96,12 +95,12 @@ public:
     void permutationGF()
     {
         uint max=pow(2,pExp);
-        for(uint sub=0;sub<genH::diagSize;sub++)
+        for(uint sub=0;sub<genH::diagNum;sub++)
         {
             auto& diagi=this->diag[sub];
-            for(uint i=0;i<9;i++)
+            for(uint i=0;i<genH::diagSize;i++)
             {
-                for(uint j=0;j<9;j++)
+                for(uint j=0;j<genH::diagSize;j++)
                 {
                     if(diagi->m[i][j]!=0)
                         diagi->m[i][j]=randNum(max,1);
@@ -120,11 +119,11 @@ public:
         }
         matArray oldDiag=copyDiag(this->diag);
         //右移
-        uint moveNum=randNum(genH::diagSize,1); //最少一个，最多比全部少一个
+        uint moveNum=randNum(genH::diagNum,1); //最少一个，最多比全部少一个
         for(uint ii=0;ii<moveNum;ii++) //对随机个小矩阵右移
         {
-            uint moveSub=randNum(genH::diagSize); //随机选择要右移的小矩阵，第几个都行
-            for(uint i=0;i<randNum(9,1);i++) //每个右移随机次，最少一次
+            uint moveSub=randNum(genH::diagNum); //随机选择要右移的小矩阵，第几个都行
+            for(uint i=0;i<randNum(genH::diagSize,1);i++) //每个右移随机次，最少一次
                 this->rightMove(moveSub);
         }
         //检测新的四环
