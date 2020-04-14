@@ -174,7 +174,7 @@ int main()
 
     //生成矩阵
     HGenerator hg;
-    for(uint i=0;i<400;i++)
+    for(uint i=0;i<300;i++)
         hg.moveDetection();
     hg.permutationGF();
     hg.tetracyclicNum=-1; //重新给四环计数

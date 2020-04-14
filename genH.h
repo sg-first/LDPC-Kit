@@ -5,7 +5,7 @@
 
 namespace  genH
 {
-    const uint diagSize=133;
+    const uint diagSize=113;
     const uint r=28*diagSize;
     const uint c=3*diagSize;
     const uint diagNum=diagSize*diagSize;
