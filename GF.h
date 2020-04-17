@@ -101,6 +101,9 @@ public:
 
     static double div(uint a, uint b)
     {
+        if(a==0) //fix: 不知道对不对，应该对吧
+            return 0;
+
         uint d=p*a;
         for(uint i=d;i<d+p;i++)
         {

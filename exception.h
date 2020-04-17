@@ -25,3 +25,12 @@ public:
         return "维度不匹配";
     }
 };
+
+class SingularException : public MatrixException
+{
+public:
+    std::string info()
+    {
+        return "奇异矩阵";
+    }
+};

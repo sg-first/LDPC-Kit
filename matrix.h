@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "GF.h"
 #include <iostream>
+#include <functional>
 
 class vector
 {
@@ -28,11 +29,32 @@ private:
 public:
         double *v;
 
+        static vector one(uint l, uint pos)
+        {
+            vector retn(l);
+            for(uint i=0;i<retn.getl();i++)
+            {
+                if(i==pos)
+                    retn.v[pos] = 1;
+                else
+                    retn.v[i] = 0;
+            }
+            return retn;
+        }
+
         vector(unsigned int l) : l(l)
         {
             this->malloc();
             for (unsigned int i = 0; i < l; i++)
                 this->v[i] = 0;
+        }
+
+        vector(uint l, const std::function<double(uint)>& f)
+        {
+            this->l = l;
+            this->malloc();
+            for (uint i = 0; i < this->l; i++)
+                this->v[i] = f(i);
         }
 
         vector(const vector& m2)
@@ -45,6 +67,11 @@ public:
             this->free();
             this->copy(m2);
             return *this;
+        }
+
+        double operator[](const uint i) const
+        {
+            return this->v[i];
         }
 
         double dot(const vector &v2) const
@@ -102,7 +129,7 @@ public:
         }
 
         ~vector() { this->free(); }
-        unsigned int getl() { return l; }
+        unsigned int getl() const { return l; }
 };
 
 
@@ -147,6 +174,9 @@ private:
             }
         }
 
+        vector solveWithLUP(const matrix& L, const matrix& U, const vector& P, const vector& b) const;
+        std::tuple<matrix,matrix,vector> LUPVec() const;
+
 public:
         double **m;
 
@@ -159,6 +189,38 @@ public:
                     for (unsigned int j = 0; j < c; j++)
                             this->m[i][j] = 0;
             }
+        }
+
+        matrix(const vector& v, bool isR)
+        {
+            if (isR)
+            {
+                this->r = v.getl();
+                this->c = 1;
+            }
+            else
+            {
+                this->r = 1;
+                this->c = v.getl();
+            }
+
+            this->malloc();
+            if (isR)
+                for (uint i = 0; i < this->r; i++)
+                    this->m[i][0] = v[i];
+            else
+                for (uint i = 0; i < this->c; i++)
+                    this->m[0][i] = v[i];
+        }
+
+        matrix(uint r, uint c, const std::function<double(uint, uint)>& f)
+        {
+            this->r = r;
+            this->c = c;
+            this->malloc();
+            for (uint i = 0; i < this->r; i++)
+                for (uint j = 0; j < this->c; j++)
+                    this->m[i][j] = f(i, j);
         }
 
         matrix(const matrix& m2)
@@ -318,8 +380,15 @@ public:
 
         matrix inv() const
         {
-            double d=this->det();
-            return this->adjoint().mul(GF::mulInv(d));
+            uint n = this->r;
+            matrix L(1,1), U(1,1);
+            vector P(1);
+            std::tie(L,U,P)=this->LUPVec();
+            vector VP(P);
+            matrix retn(n, n);
+            for (uint i = 0; i < n; i++)
+                retn.setCVector(solveWithLUP(L, U, P, vector::one(n, i)), i);
+            return retn;
         }
 
         matrix dot(const matrix &m2) const
@@ -447,42 +516,32 @@ public:
             return retn;
         }
 
-       void toUnit(unsigned int unitStart)
+       void maxTri()
         {
-            for(unsigned int i=0;i<this->r;i++)
+            auto getUpZeroNum=[&](uint j)
             {
-                //用第i行的第c-1-i个数消下面所有
-                //要保证ii必须是1，否则没法消
-                bool isfound=false;
-                for(unsigned int j=i;j<this->r;j++)
+                uint num=0;
+                for(uint i=0;i<this->r;i++)
                 {
-                    if(this->m[j][unitStart+i]==1)
+                    if(this->m[i][j]<Err)
                     {
-                        this->rswap(i,j);
-                        isfound=true;
-                        break;
+                        this->m[i][j]=0;
+                        num++;
                     }
+                    else
+                        break;
                 }
-                if(!isfound)
-                    break;
-                for(unsigned int j=i+1;j<this->r;j++)
+                return num;
+            };
+
+            for(uint k=0;k<this->c;k++)
+            {
+                for(uint i=0;i<this->c-k;i++)
                 {
-                    if(this->m[j][unitStart+i]==1)
-                        this->radd(j,i); //改变的是j
+                    if(getUpZeroNum(i)>getUpZeroNum(i+1))
+                        this->cswap(i,i+1);
                 }
             }
-
-            /*for(unsigned int i=this->r-1;i>=0;i--)
-            {
-                if(this->m[i][unitStart+i]==1)
-                {
-                    for(unsigned int j=i-1;j>=0;j--)
-                    {
-                        if(this->m[j][unitStart+i]==1)
-                            this->radd(j,i); //改变的是j
-                    }
-                }
-            }*/
         }
 
         std::tuple<matrix,matrix,matrix> LUP() const
@@ -491,7 +550,6 @@ public:
                 throw SquareException();
             unsigned int n = this->r;
             matrix a = *this;
-            auto abs = [](double n) {return n >= 0 ? n : -n; };
             matrix l(n, n);
             matrix u(n, n);
             matrix p = matrix::identity(n);
@@ -503,12 +561,12 @@ public:
                 {
                     if (abs(a.m[i][k]) > m)
                     {
-                        m = abs(a.m[i][k]);
+                        m = a.m[i][k];
                         kp = i;
                     }
                 }
                 if (m == 0)
-                    throw std::string("奇异矩阵");
+                    throw SingularException();
                 p.rswap(k, kp);
                 a.rswap(k, kp);
                 l.rswap(k, kp);
@@ -517,9 +575,12 @@ public:
                     u.m[k][i] = a.m[k][i];
                 for (unsigned int i = k + 1; i < n; i++)
                 {
-                    a.m[i][k] /= a.m[k][k];
+                    a.m[i][k]=GF::div(a.m[i][k],a.m[k][k]);
                     for (unsigned int j = k + 1; j < n; j++)
-                        a.m[i][j] -= a.m[i][k] * a.m[k][j];
+                    {
+                        uint ikMjk=GF::mul(a.m[i][k],a.m[k][j]);
+                        a.m[i][j]=GF::add(a.m[i][j],ikMjk);
+                    }
                     l.m[i][k] = a.m[i][k];
                 }
             }
@@ -574,6 +635,11 @@ public:
                 }
                 printf("\n");
             }
+        }
+
+        double* operator[](const uint i) const
+        {
+            return this->m[i];
         }
 
         static vector solve(matrix m, vector v) //克拉默法则求解
