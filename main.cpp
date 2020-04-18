@@ -106,9 +106,9 @@ int main()
     GF::initMulTable();
 
     std::vector<int>av;
-    matrix H=matIO::ReadMatFile("D:/H(339×3098).csv",337,3098);
+    matrix H=matIO::ReadMatFile("D:/H(339×3070).csv",337,3098);
 
-    uint g=H.getr()-54;
+    uint g=H.getr()-199;
     uint mg=H.getr()-g;
     uint nm=H.getc()-H.getr();
 
