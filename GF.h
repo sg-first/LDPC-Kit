@@ -122,4 +122,3 @@ public:
             return div(i,1);
     }
 };
-uint GF::mulTable[p*p][3];

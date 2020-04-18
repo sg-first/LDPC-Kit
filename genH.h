@@ -6,9 +6,11 @@
 namespace  genH
 {
     const uint diagSize=113;
-    const uint r=28*diagSize;
-    const uint c=3*diagSize;
-    const uint diagNum=diagSize*diagSize;
+    const uint rNum=3;
+    const uint cNum=28;
+    const uint r=rNum*diagSize;
+    const uint c=cNum*diagSize;
+    const uint diagNum=rNum*cNum;
 }
 
 typedef std::array<uint,4> cycle;
@@ -69,6 +71,9 @@ public:
 
     void rightMove(uint sub)
     {
+        if(sub==genH::cNum-1) //右上角的不右移
+            return;
+
         auto& diagi=this->diag[sub];
         for(uint i=0;i<genH::diagSize;i++)
         {

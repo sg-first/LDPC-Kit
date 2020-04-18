@@ -8,9 +8,10 @@
 #include <ctime>
 #include "genH.h"
 #include "matIO.h"
+#include <bitset>
 
-const uint sLength=2761;
-const uint cLength=3098;
+uint sLength;
+uint cLength;
 
 uint calu1(matrix m,uint start=0)
 {
@@ -61,13 +62,21 @@ std::string binaryConversion(int num,int bin=GF::p)
 }
 
 matrix *errorMat=nullptr;
+typedef std::bitset<GF::p> bitset;
 
 std::string randstr()
 {
     std::string result="";
-    for(uint i=0;i<sLength;i++)
+    for(uint i=0;i<sLength-1;i++) //先生成前几位
         result+=std::to_string(std::rand() % 8);
-    return result;
+    //fix:二进制生成最后一位
+    bitset last;
+    for(uint i=1;i<GF::p;i++)
+    {
+        if(int(std::rand()%2)==1)
+            last.flip(i);
+    }
+    return result+std::to_string(last.to_ulong());
 }
 
 void checkLoop(uint min,uint max,
@@ -106,9 +115,11 @@ int main()
     GF::initMulTable();
 
     std::vector<int>av;
-    matrix H=matIO::ReadMatFile("D:/H(339×3070).csv",337,3098);
+    matrix H=matIO::ReadMatFile("D:/H(339×3070).csv",339,3070);
+    cLength=H.getc();
+    sLength=cLength-H.getr();
 
-    uint g=H.getr()-199;
+    uint g=H.getr()-113;
     uint mg=H.getr()-g;
     uint nm=H.getc()-H.getr();
 
@@ -120,33 +131,29 @@ int main()
     matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
+    matIO::saveMatFile("D:/fi.csv",fi);
     matrix fii=fi.inv();
-    //matrix fii=matIO::ReadMatFile("D:/fii.csv",18,18);
+    fii.dot(fi).output();
+
     matrix A=H.cut(0,0,nm-1,mg-1);
     matrix C=H.cut(0,mg,nm-1,H.getr()-1);
 
     //计算所需
     matrix fii_ETiA_C=E.dot(Ti).dot(A).add(C);
     fii_ETiA_C=fii.dot(fii_ETiA_C); //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
-    /*std::cout<<"fii_ETiA_C:"<<std::endl;
-    fii_ETiA_C.output();*/
+    matIO::saveMatFile("D:/1.csv",fii_ETiA_C);
 
     matrix TiA=Ti.dot(A);  //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
-    /*std::cout<<"TiA:"<<std::endl;
-    TiA.output();*/
+    matIO::saveMatFile("D:/2.csv",TiA);
 
     matrix TiB=Ti.dot(B);  //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
-    /*std::cout<<"TiB:"<<std::endl;
-    TiB.output();*/
+    matIO::saveMatFile("D:/3.csv",TiB);
 
     checkLoop(0,50,fii_ETiA_C,TiA,TiB,H);
 
     //生成矩阵
     /*HGenerator hg;
-    for(uint i=0;i<300;i++)
-        hg.moveDetection();
     hg.permutationGF();
-    hg.tetracyclicNum=-1; //重新给四环计数
     uint usefulNum;
     for(uint i=0;i<50000;i++)
     {
@@ -158,12 +165,6 @@ int main()
     std::cout<<"result:"<<hg.tetracyclicNum<<std::endl;
     std::cout<<"last:"<<50000-usefulNum<<std::endl;
     matIO::saveMatFile("D:/result.csv", hg.getH());*/
-
-    //最大下三角
-    /*matrix H=matIO::ReadMatFile("D:/27×1393校验矩阵.csv",genH::r,genH::c-2);
-    H.maxTri();
-    H.output();
-    std::cout<<HGenerator::tetracyclicDetection(H).size()<<std::endl;*/
 
     //去掉两列
     /*auto cy=HGenerator::tetracyclicDetection(H);

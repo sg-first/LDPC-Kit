@@ -384,7 +384,6 @@ public:
             matrix L(1,1), U(1,1);
             vector P(1);
             std::tie(L,U,P)=this->LUPVec();
-            vector VP(P);
             matrix retn(n, n);
             for (uint i = 0; i < n; i++)
                 retn.setCVector(solveWithLUP(L, U, P, vector::one(n, i)), i);
@@ -544,48 +543,7 @@ public:
             }
         }
 
-        std::tuple<matrix,matrix,matrix> LUP() const
-        {
-            if (this->r != this->c)
-                throw SquareException();
-            unsigned int n = this->r;
-            matrix a = *this;
-            matrix l(n, n);
-            matrix u(n, n);
-            matrix p = matrix::identity(n);
-            for (unsigned int k = 0; k < n; k++)
-            {
-                double m = 0;
-                unsigned int  kp = 0;
-                for (unsigned int i = k; i < n; i++)
-                {
-                    if (abs(a.m[i][k]) > m)
-                    {
-                        m = a.m[i][k];
-                        kp = i;
-                    }
-                }
-                if (m == 0)
-                    throw SingularException();
-                p.rswap(k, kp);
-                a.rswap(k, kp);
-                l.rswap(k, kp);
-                l.m[k][k] = 1;
-                for (unsigned int i = k; i < n; i++)
-                    u.m[k][i] = a.m[k][i];
-                for (unsigned int i = k + 1; i < n; i++)
-                {
-                    a.m[i][k]=GF::div(a.m[i][k],a.m[k][k]);
-                    for (unsigned int j = k + 1; j < n; j++)
-                    {
-                        uint ikMjk=GF::mul(a.m[i][k],a.m[k][j]);
-                        a.m[i][j]=GF::add(a.m[i][j],ikMjk);
-                    }
-                    l.m[i][k] = a.m[i][k];
-                }
-            }
-            return std::make_tuple(l,u,p);
-        }
+        std::tuple<matrix,matrix,matrix> LUP() const;
 
         void radd(unsigned int r1, unsigned int r2)
         {
