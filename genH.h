@@ -166,21 +166,22 @@ public:
         {
             for(uint i=nowi+1;i<H.getr();i++)
             {
-                if(H.m[i][p1]==b && H.m[i][p2]==b)
-                    result.push_back({nowi,p1,i,p2});
+                if(H.m[i][p1]!=0 && H.m[i][p2]!=0)
+                    if(H.m[i][p1] == H.m[i][p2]) //横着分别两两相等即可
+                        result.push_back({nowi,p1,i,p2});
             }
         };
 
-        auto deteAllGroup=[deteGroup](const std::vector<uint> &allp,uint b,uint nowi)
+        auto deteAllGroup=[deteGroup](const std::vector<uint> &allp,uint b,uint nowi) //所有位置，元素，当前列（在这一列找）
         {
             for(uint i=0;i<allp.size()-1;i++)
                 for(uint j=i+1;j<allp.size();j++)
-                    deteGroup(allp[i],allp[j],b,nowi);
+                    deteGroup(allp[i],allp[j],b,nowi); //同行两两匹配，在这一列找
         };
 
         for(uint i=0;i<H.getr();i++)
         {
-            std::map<uint,std::vector<uint>> allCD;
+            std::map<uint,std::vector<uint>> allCD; //同一行中，每个元素都在哪些位置出现
             for(uint j=0;j<H.getc();j++)
             {
                 if(H.m[i][j]!=0)
