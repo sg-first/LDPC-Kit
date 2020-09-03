@@ -175,9 +175,10 @@ private:
         }
 
         vector solveWithLUP(const matrix& L, const matrix& U, const vector& P, const vector& b) const;
-        std::tuple<matrix,matrix,vector> LUPVec() const;
+
 
 public:
+        std::tuple<matrix,matrix,vector> LUPVec() const;
         double **m;
 
         matrix(unsigned int r, unsigned int c) : r(r), c(c)

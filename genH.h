@@ -1,13 +1,15 @@
 #pragma once
 #include "matrix.h"
+#include "matIO.h"
 #include <map>
 #include <array>
+#include <ctime>
 
 namespace  genH
 {
-    const uint diagSize=113;
+    const uint diagSize=8;
     const uint rNum=3;
-    const uint cNum=28;
+    const uint cNum=16;
     const uint r=rNum*diagSize;
     const uint c=cNum*diagSize;
     const uint diagNum=rNum*cNum;
@@ -47,6 +49,27 @@ public:
     ~HGenerator()
     {
         this->deleteDiag(this->diag);
+    }
+
+    static void generate(uint num=1, uint maxIterNum=50000)
+    {
+        for(uint j=0;j<num;j++)
+        {
+            srand((int)time(0));
+            HGenerator hg;
+            hg.permutationGF();
+            uint usefulNum;
+            for(uint i=0;i<maxIterNum;i++)
+            {
+                if(hg.moveDetection())
+                    usefulNum=i;
+                if(hg.tetracyclicNum==0)
+                    break;
+            }
+            std::cout<<"result:"<<hg.tetracyclicNum<<std::endl;
+            std::cout<<"last:"<<maxIterNum-usefulNum<<std::endl;
+            matIO::saveMatFile("D:/H"+QString::number(j)+".csv", hg.getH());
+        }
     }
 
     static matrix getH(const matArray &diag)
@@ -108,7 +131,7 @@ public:
                 for(uint j=0;j<genH::diagSize;j++)
                 {
                     if(diagi->m[i][j]!=0)
-                        diagi->m[i][j]=randNum(max,1);
+                        diagi->m[i][j]=randNum(max,2);
                 }
             }
         }

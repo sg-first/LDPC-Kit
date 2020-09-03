@@ -5,7 +5,7 @@
 
 typedef unsigned int uint;
 
-const uint pExp = 3; //2^3=8
+const uint pExp = 4; //2^3=8
 const uint maxP=(pExp-1)*2+1;
 const uint ppHighSub=pExp; //x3=1000，下标为3，就是3
 const uint primitivePolynomials=3; //x+1=11=3

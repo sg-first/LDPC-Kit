@@ -9,36 +9,35 @@ vector matrix::solveWithLUP(const matrix& L, const matrix& U, const vector& P, c
     //L为下三角矩阵，解出y
     //U为上三角矩阵，解出x
     uint n = b.getl();
-    vector y(n);
+    vector y(n,[](uint i){return 0;});
+
     for (uint i = 0; i < n; i++)
     {
         y.v[i] = b[(uint)P[i]];
         for (uint j = 0; j < i; j++)
         {
-            uint ikMjk=GF::mul(L[i][j],y[j]);
-            y.v[i]=GF::add(y.v[i],ikMjk);
+            double a=GF::mul(L.m[i][j],y.v[j]);
+            y.v[i]= GF::add(y.v[i],a);
         }
     }
 
-    vector x = y;
+    vector x=y;
     for (uint i = n - 1; i > 0; i--)
     {
-        for (uint j = i + 1; j < n; j++)
+        for(uint j=i+1;j<n;j++)
         {
-            uint ikMjk=GF::mul(U[i][j],x[j]);
-            x.v[i]=GF::add(x.v[i],ikMjk);
+            double a=GF::mul(U.m[i][j],x.v[j]);
+            x.v[i]=GF::add(x.v[i],a);
         }
-        x.v[i]=GF::div(x.v[i],U[i][i]);
+        x.v[i]=GF::div(U.m[i][i],x.v[i]);
     }
-
-    for (uint j = 1; j < n; j++)
+    for(uint j=1;j<n;j++)
     {
-        uint ikMjk=GF::mul(U[0][j],x[j]);
-        x.v[0]=GF::add(x.v[0],ikMjk);
+        double a=GF::mul(U[0][j],x.v[j]);
+        x.v[0]=GF::add(x.v[0],a);
     }
+    x.v[0]=GF::div(U.m[0][0],x.v[0]);
 
-    x.v[0]=GF::div(x.v[0],U[0][0]);
-    //就是j>=0，但由于unsigned限制就拆开写了
     return x;
 }
 
@@ -100,34 +99,43 @@ std::tuple<matrix,matrix,matrix> matrix::LUP() const
     matrix p = matrix::identity(n);
     for (unsigned int k = 0; k < n; k++)
     {
-        double m = 0;
-        unsigned int  kp = 0;
+        double max = 0;
+        unsigned int maxpos = 0;
         for (unsigned int i = k; i < n; i++)
         {
-            if (abs(a.m[i][k]) > m)
+            if (a.m[i][k] > max)
             {
-                m = a.m[i][k];
-                kp = i;
+                max = a.m[i][k];
+                maxpos = i;
             }
         }
-        if (m == 0)
+        if(max == 0)
             throw SingularException();
-        p.rswap(k, kp);
-        a.rswap(k, kp);
-        l.rswap(k, kp);
-        l.m[k][k] = 1;
-        for (unsigned int i = k; i < n; i++)
-            u.m[k][i] = a.m[k][i];
-        for (unsigned int i = k + 1; i < n; i++)
+        if(k!=maxpos)
         {
-            a.m[i][k]=GF::div(a.m[i][k],a.m[k][k]);
-            for (unsigned int j = k + 1; j < n; j++)
-            {
-                uint ikMjk=GF::mul(a.m[i][k],a.m[k][j]);
-                a.m[i][j]=GF::add(a.m[i][j],ikMjk);
-            }
-            l.m[i][k] = a.m[i][k];
+            p.rswap(k, maxpos);
+            a.rswap(k, maxpos);
+            //l.rswap(k, maxpos);
         }
+
+        for (unsigned int i = k+1; i < n; i++)
+        {
+            a.m[i][k]=GF::div(a.m[k][k],a.m[i][k]);
+            for(unsigned int j=k+1;j<n;j++)
+                a.m[i][j]=GF::add(a.m[i][j],a.m[i][k]);
+        }
+    }
+    for(unsigned int i=0;i<n;i++)
+        l.m[i][i]=1;
+    for(unsigned int i=0;i<n;i++)
+    {
+        for(unsigned int j=0;j<i;j++)
+            l.m[i][j]=a.m[i][j];
+    }
+    for(unsigned int i=0;i<n;i++)
+    {
+        for(unsigned int j=i;j<n;j++)
+            u.m[i][j]=a.m[i][j];
     }
     return std::make_tuple(l,u,p);
 }

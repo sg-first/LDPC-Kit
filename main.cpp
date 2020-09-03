@@ -5,7 +5,6 @@
 #include <thread>
 #include <map>
 #include <array>
-#include <ctime>
 #include "genH.h"
 #include "matIO.h"
 #include <bitset>
@@ -111,28 +110,35 @@ void checkLoop(uint min,uint max,
 
 int main()
 {
+    //HGenerator::generate();
     //编码
     GF::initMulTable();
 
     std::vector<int>av;
-    matrix H=matIO::ReadMatFile("D:/H(339×3070).csv",339,3070);
+    matrix H=matIO::ReadMatFile("D:/H0.csv",24,128);
     cLength=H.getc();
     sLength=cLength-H.getr();
 
-    uint g=H.getr()-113;
+    uint g=H.getr()-8;
     uint mg=H.getr()-g;
     uint nm=H.getc()-H.getr();
 
     matrix T=H.cut(nm+g,0,H.getc()-1,mg-1);
+    T.output();
+    std::cout<<std::endl;
     matrix Ti=T.inv();
+    Ti.dot(T).output();
+    std::cout<<std::endl;
     matrix E=H.cut(nm+g,mg,H.getc()-1,H.getr()-1);
     matrix B=H.cut(nm,0,nm+g-1,mg-1);
     matrix D=H.cut(nm,mg,nm+g-1,H.getr()-1);
     matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
-    matIO::saveMatFile("D:/fi.csv",fi);
+    fi.output();
+    std::cout<<std::endl;
     matrix fii=fi.inv();
+    //matrix fii=matIO::ReadMatFile("D:/invfi.csv",226,226);
     fii.dot(fi).output();
 
     matrix A=H.cut(0,0,nm-1,mg-1);
@@ -150,21 +156,6 @@ int main()
     matIO::saveMatFile("D:/3.csv",TiB);
 
     checkLoop(0,50,fii_ETiA_C,TiA,TiB,H);
-
-    //生成矩阵
-    /*HGenerator hg;
-    hg.permutationGF();
-    uint usefulNum;
-    for(uint i=0;i<50000;i++)
-    {
-        if(hg.moveDetection())
-            usefulNum=i;
-        if(hg.tetracyclicNum==0)
-            break;
-    }
-    std::cout<<"result:"<<hg.tetracyclicNum<<std::endl;
-    std::cout<<"last:"<<50000-usefulNum<<std::endl;
-    matIO::saveMatFile("D:/result.csv", hg.getH());*/
 
     //去掉两列
     /*auto cy=HGenerator::tetracyclicDetection(H);

@@ -70,10 +70,17 @@ public:
     {
         matrix m(r,c);
         QString content=ReadTXT(path);
-        content.replace(",","");
         QStringList allLine=content.split('\n');
         for(uint i=0;i<r;i++)
-            assignment(m.m[i],allLine[i].toStdString(),c);
+        {
+            QString line=allLine[i];
+            QStringList allNum=line.split(',');
+            for(uint j=0;j<c;j++)
+            {
+                uint elm=allNum[j].toInt();
+                m.m[i][j]=elm;
+            }
+        }
         return m;
     }
 
