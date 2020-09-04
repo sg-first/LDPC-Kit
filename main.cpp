@@ -124,9 +124,9 @@ int main()
     uint nm=H.getc()-H.getr();
 
     matrix T=H.cut(nm+g,0,H.getc()-1,mg-1);
-    T.output();
-    std::cout<<std::endl;
     matrix Ti=T.inv();
+    Ti.output();
+    std::cout<<std::endl;
     Ti.dot(T).output();
     std::cout<<std::endl;
     matrix E=H.cut(nm+g,mg,H.getc()-1,H.getr()-1);
@@ -135,11 +135,21 @@ int main()
     matrix fi=E.dot(Ti);
     fi=fi.dot(B);
     fi=fi.add(D);
+    matrix fii=fi.inv();
     fi.output();
     std::cout<<std::endl;
-    matrix fii=fi.inv();
+    fii.output();
+    std::cout<<std::endl;
     //matrix fii=matIO::ReadMatFile("D:/invfi.csv",226,226);
     fii.dot(fi).output();
+
+    //LUP分解验证
+    std::cout<<std::endl;
+    matrix L(1,1),U(1,1),P(1,1);
+    std::tie(L,U,P)=fi.LUP();
+    P.dot(fi).output();
+    std::cout<<std::endl;
+    L.dot(U).output();
 
     matrix A=H.cut(0,0,nm-1,mg-1);
     matrix C=H.cut(0,mg,nm-1,H.getr()-1);
@@ -147,13 +157,13 @@ int main()
     //计算所需
     matrix fii_ETiA_C=E.dot(Ti).dot(A).add(C);
     fii_ETiA_C=fii.dot(fii_ETiA_C); //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
-    matIO::saveMatFile("D:/1.csv",fii_ETiA_C);
+    matIO::saveMatFile("D:/x.csv",fii_ETiA_C);
 
     matrix TiA=Ti.dot(A);  //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
-    matIO::saveMatFile("D:/2.csv",TiA);
+    matIO::saveMatFile("D:/L.csv",TiA);
 
     matrix TiB=Ti.dot(B);  //这里原先有个逐元素取加法逆元的操作，因为结果不变去掉
-    matIO::saveMatFile("D:/3.csv",TiB);
+    matIO::saveMatFile("D:/M.csv",TiB);
 
     checkLoop(0,50,fii_ETiA_C,TiA,TiB,H);
 
