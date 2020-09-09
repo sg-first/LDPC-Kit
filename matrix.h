@@ -94,7 +94,7 @@ public:
         {
             vector result(this->l);
             for (unsigned int i = 0; i < l; i++)
-                result.v[i]=this->v[i]*n;
+                result.v[i]=GF::mul(this->v[i],n);
             return result;
         }
 
@@ -381,14 +381,52 @@ public:
 
         matrix inv() const
         {
-            uint n = this->r;
-            matrix L(1,1), U(1,1);
-            vector P(1);
-            std::tie(L,U,P)=this->LUPVec();
-            matrix retn(n, n);
-            for (uint i = 0; i < n; i++)
-                retn.setCVector(solveWithLUP(L, U, P, vector::one(n, i)), i);
-            return retn;
+            if(this->r != this->c)
+                throw SingularException();
+            unsigned int n = this->r;
+            matrix m = *this;
+            matrix e = matrix::identity(n);
+
+            // 变为右上三角矩阵
+            for(unsigned int i = 0; i < n; i++)
+            {
+                unsigned int j;
+                for(j = i; j < n; j++)
+                    if(m.m[j][i] != 0)
+                    {
+                        e.rswap(i, j);
+                        m.rswap(i, j);
+                        break;
+                    }
+                if(j == n)
+                    throw SingularException();
+                //m.output();
+                //std::cout<<std::endl;
+                for(j = i + 1; j < n; j++)
+                {
+                    e.radd(j, i, GF::div(m.m[i][i],m.m[j][i]));
+                    m.radd(j, i, GF::div(m.m[i][i],m.m[j][i]));
+                }
+            }
+
+            // 变为单位矩阵
+            for(unsigned int i = n - 1; i > 0; i--)
+            {
+                if(m.m[i][i] == 0)
+                    throw SingularException();
+                e.rmul(i, GF::mulInv(m.m[i][i]));
+                m.rmul(i, GF::mulInv(m.m[i][i]));
+                for(unsigned int j = i - 1; j > 0; j--)
+                {
+                    e.radd(j, i, GF::div(m.m[i][i],m.m[j][i]));
+                    m.radd(j, i, GF::div(m.m[i][i],m.m[j][i]));
+                }
+                e.radd(0, i, GF::div(m.m[i][i],m.m[0][i]));
+                m.radd(0, i, GF::div(m.m[i][i],m.m[0][i]));
+            }
+            e.rmul(0, GF::mulInv(m.m[0][0]));
+            m.rmul(0, GF::mulInv(m.m[0][0]));
+            return e;
         }
 
         matrix dot(const matrix &m2) const
@@ -481,7 +519,7 @@ public:
                 }
                 double x = t.m[i][i];
                 for (unsigned int j = i + 1; j < nonZero; j++)
-                    t.rsub(j, i, t.m[j][i] / x);
+                    t.radd(j, i, t.m[j][i] / x);
                 //更新nonZero，把所有零行放到矩阵下面
                 for(unsigned int j = i; j < nonZero;j++)
                 {
@@ -546,16 +584,11 @@ public:
 
         std::tuple<matrix,matrix,matrix> LUP() const;
 
-        void radd(unsigned int r1, unsigned int r2)
-        {
-            this->rsub(r1,r2,-1);
-        }
-
-        void rsub(unsigned int r1, unsigned int r2, double m)
+        void radd(unsigned int r1, unsigned int r2, double m)
         {
             vector vr1=this->getRVector(r1);
             vector vr2=this->getRVector(r2);
-            vector vr22=vr2.mul(-1*m);
+            vector vr22=vr2.mul(m);
             this->setRVector(vr1.add(vr22),r1); //改变的是r1
         }
 

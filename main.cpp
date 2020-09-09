@@ -143,14 +143,6 @@ int main()
     //matrix fii=matIO::ReadMatFile("D:/invfi.csv",226,226);
     fii.dot(fi).output();
 
-    //LUP分解验证
-    std::cout<<std::endl;
-    matrix L(1,1),U(1,1),P(1,1);
-    std::tie(L,U,P)=fi.LUP();
-    P.dot(fi).output();
-    std::cout<<std::endl;
-    L.dot(U).output();
-
     matrix A=H.cut(0,0,nm-1,mg-1);
     matrix C=H.cut(0,mg,nm-1,H.getr()-1);
 

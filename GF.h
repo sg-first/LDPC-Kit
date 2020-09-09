@@ -99,9 +99,9 @@ public:
         return mulTable[p*a+b][2];
     }
 
-    static double div(uint a, uint b)
+    static double div(uint a, uint b) //b是2，是乘完的结果（被除数）
     {
-        if(a==0) //fix: 不知道对不对，应该对吧
+        if(b==0)
             return 0;
 
         uint d=p*a;
