@@ -67,7 +67,7 @@ std::string randstr()
 {
     std::string result="";
     for(uint i=0;i<sLength-1;i++) //先生成前几位
-        result+=std::to_string(std::rand() % 8);
+        result+=std::to_string(std::rand() % GF::p);
     //fix:二进制生成最后一位
     bitset last;
     for(uint i=1;i<GF::p;i++)
@@ -110,7 +110,7 @@ void checkLoop(uint min,uint max,
 
 int main()
 {
-    //HGenerator::generate();
+    HGenerator::generate();
     //编码
     GF::initMulTable();
 

@@ -122,7 +122,6 @@ public:
 
     void permutationGF()
     {
-        uint max=pow(2,pExp);
         for(uint sub=0;sub<genH::diagNum;sub++)
         {
             auto& diagi=this->diag[sub];
@@ -131,7 +130,7 @@ public:
                 for(uint j=0;j<genH::diagSize;j++)
                 {
                     if(diagi->m[i][j]!=0)
-                        diagi->m[i][j]=randNum(max,2);
+                        diagi->m[i][j]=randNum(GF::p,2);
                 }
             }
         }
