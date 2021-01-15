@@ -1,5 +1,14 @@
 ﻿LDPC Kit
 =========
+目录
+----------
+这个仓库是基于LDPC的NANDFlash控制器项目的一部分
+* 本仓库为C++编写的有限域矩阵库和LDPC校验矩阵编码/检验库
+* 基于LDPC的NANDFlash控制器接口实现在[这个仓库](https://gitee.com/sg-first/NANDFlash_IO)
+* 项目的完整文档已发表于OALib Preprint：Liu, T. , Yu, H. , Zhang, G. , Li, Y. , Zhou, M. , Zhang, Z. , Xin, X. , Liu, S. and Ren, J. (2021). Design of NAND Flash Controller Based on NB-LDPC ECC. Open Access Library PrePrints, 5, e293. doi: http://dx.doi.org/10.4236/oalib.preprints.1200293.
+
+概述
+---------
 最近几年，低密度奇偶校验码(Low Density Parity Check Codes，LDPC) 以相对较低的编解码复杂难度和良好的纠错性能受到广泛关注。在码长相同以及码率相同的情况下，有限域LDPC码的性能超越二进制LDPC码。本套件针对LDPC编译码硬件设计问题，完成了以下工作：
 
 * 基于纯C++的有限域计算与有限域矩阵运算库，可在不同阶数与本征多项式的有限域下进行运算，可自行生成乘法表
